@@ -1,0 +1,557 @@
+bplist00“_WebMainResource_WebSubresources’	
+_WebResourceData_WebResourceMIMEType_WebResourceTextEncodingName^WebResourceURL_WebResourceFrameNameO?}<html><head>
+  <title>CSCI 3300 programming assignment 1</title>
+  <link rel="stylesheet" href="../../3300.css" type="text/css">
+<style type="text/css"></style><style></style></head>
+
+<body>
+<h1>
+  Computer Science 3300<br>
+  Spring 2015<br>
+  Section 001<br>
+  Programming Assignment 1<br>
+</h1>
+
+<p></p><div align="center"><table>
+  <tbody><tr>
+    <td><b>Assigned:</b></td>
+    <td>Monday, January 26</td>
+  </tr>
+  <tr>
+    <td><b>Version (a) due:</b></td>
+    <td>Monday, February 2, 11:59pm</td>
+  </tr>
+  <tr>
+    <td><b>Version (b) due:</b></td>
+    <td>Saturday, February 21, 11:59pm</td>
+  </tr>
+</tbody></table>
+</div><p></p>
+
+<hr>
+
+<h3>Table of contents</h3>
+
+<p></p><ol>
+  <li><a href="#note">Note about this assignment</a></li>
+  <li><a href="#background">Background</a></li>
+  <li><a href="#functionalrequirements">Functional requirements</a></li>
+  <li><a href="#nonfunctionalrequirements">Nonfunctional requirements</a></li>
+  <li><a href="#design">Design issues</a></li>
+  <li><a href="#run">Compiling and testing your program</a></li>
+  <li><a href="#plan">A development plan</a></li>
+  <li><a href="#submit">Submitting your work</a></li>
+  <li><a href="#late">Late submissions</a></li>
+</ol><p></p>
+
+
+<hr>
+<a name="note"></a>
+<h2>Note about This Assignment</h2>
+
+<p>This assignment is intended to familiarize you with C++, loops,
+functions and contracts.
+</p>
+
+<p><b>It is important that you follow the instructions.  Do not try to 
+improve on the design described here.
+Read the entire assignment before you start working on it.</b>
+</p>
+
+
+<hr>
+<a name="background"></a>
+<h2>Background</h2>
+
+<p>Given any positive integer <i>n</i>, the <i>hailstone sequence</i> starting
+at <i>n</i> is obtained as follows.  You write a sequence of numbers,
+one after another.  Start by writing <i>n</i>.  If
+<i>n</i> is even, then the next number is <i>n</i>/2.  If <i>n</i> is
+odd, then the next number is 3<i>n</i> + 1.  Continue in this way until
+you write the number 1.
+</p>
+
+<p>For example, if you start at 7, then the next number is 22 
+(3 times 7 plus 1).  The next number after 22 is 11.  The
+hailstone sequence starting at 7 is [7, 22, 11, 34, 17, 52, 26, 13,
+40, 20, 10, 5, 16, 8, 4, 2, 1], and it contains 17 numbers.
+The hailstone sequence starting at 6 is [6, 3, 10, 5, 16, 8, 4, 2, 1], and
+the hailstone sequence starting at 1 is [1].
+</p>
+
+
+<hr>
+<a name="functionalrequirements"></a>
+<h2>Functional Requirements</h2>
+
+<p>The <span class="term">functional requirements</span> tell what the program
+is supposed to do.
+</p>
+
+<p>Write a C++ program that reads a number <i>n</i> from the user
+(after giving a suitable prompt) and then tells the user the following information:
+</p><ol>
+  <li>
+    the entire hailstone sequence starting at <i>n</i>,
+    all on one line, with the numbers separated by spaces;
+  </li>
+  <li>
+    the length of the hailstone sequence that starts with <i>n</i>;
+  </li>
+  <li>
+    the largest number in the hailstone sequence that starts with <i>n</i>;
+  </li>
+  <li>
+    the number of <span class="term">local maxima</span> in the hailstone
+    sequence that starts with <i>n</i>; 
+  </li>
+  <li>
+    the largest length of any hailstone sequence starting with
+    a number from 1 to <i>n</i>.
+  </li>
+</ol>
+A <span class="term">local maximum</span> is a value in the sequence
+that is larger than the value on either side of it.  
+For example, the hailstone sequence starting at 7 is
+[7, 22, 11, 34, 17, 52, 26, 13, 40, 20, 10, 5, 16, 8, 4, 2, 1].
+The local maxima are 22, 34, 52, 40 and 16, so there are 5 local maxima.
+The initial value
+is a local maximum if the value that follows it is smaller, and the sole
+value in a sequence of length 1 is a local maximum.
+So [22, 11, 34, 17, 52, 26, 13, 40, 20, 10, 5, 16, 8, 4, 2, 1] also has
+5 local maxima.
+<p></p>
+
+<p>The output needs to be sensible and easy to read, not just numbers.
+For example, a session with this program might look as follows.
+Parts in black are written by the program.  
+Parts in blue are typed by the user.
+<b></b></p><pre><b>  What number shall I start with?  <font color="blue"><b>7</b></font>
+  The hailstone sequence starting at 7 is:
+  7 22 11 34 17 52 26 13 40 20 10 5 16 8 4 2 1
+  The length of the sequence is 17.
+  The largest number in the sequence is 52.
+  There are 5 local maxima.
+  The longest hailstone sequence starting with a number up to 7 has length 17</b></pre>
+<p></p>
+
+<p>Here is another example.
+<b></b></p><pre><b>  What number shall I start with?  <font color="blue"><b>1</b></font>
+  The hailstone sequence starting at 1 is
+  1
+  The length of the sequence is 1.
+  The largest number in the sequence is 1.
+  There are 1 local maxima.
+  The longest hailstone sequence starting with a number up to 1 has length 1</b></pre>
+<p></p>
+
+<p>And here is another.
+<b></b></p><pre><b>  What number shall I start with?  <font color="blue"><b>8</b></font>
+  The hailstone sequence starting at 8 is
+  8 4 2 1
+  The length of the sequence is 4.
+  The largest number in the sequence is 8.
+  There are 1 local maxima.
+  The longest hailstone sequence starting with a number up to 8 has length 17</b></pre>
+<p></p>
+
+
+<hr>
+<a name="nonfunctionalrequirements"></a>
+<h2>Nonfunctional Requirements</h2>
+
+<p>The <span class="term">nonfunctional requirements</span> 
+are additional requirements on how the
+program must be written, documented, etc., that are not directly
+concerned with what the program does when you run it.
+</p>
+
+<p>The program is <b><i>required</i></b> to be written in accordance with the
+design issues discussed below.
+You are required to start from the
+<a href="../../Notes/Standards/template.txt">template</a> that is provided.
+</p>
+
+<p>The program is required to follow the 
+<a href="../../Notes/Standards/index.html">coding standards</a>
+for this course, which include the following.
+</p><ul>
+  <li>
+    The program must use the correct
+    <a href="../../Notes/Standards/fileformat.html">file format</a> and
+    <a href="../../Notes/Standards/fileformat.html">file name</a>.  Be sure
+    to indent well.
+  </li>
+  <li>
+    Every function is required to have a 
+    <a href="../../Notes/Standards/contract.html">clear, concise and
+    precise contract</a>.
+  </li>
+  <li>
+    Each function can have <a href="../../Notes/Standards/function.html#functionloop">at most one loop</a>
+    in its body.
+  </li>
+  <li>
+    A function body must 
+    <a href="../../Notes/Standards/variable.html#changeparam">not change the value of a call-by-value
+    parameter.</a>
+  </li>
+  <li>
+    Do not write functions that 
+    <a href="../../Notes/Standards/function.html#crippled">do not perform their whole jobs.</a>
+  </li>
+  <li>
+    Use <a href="../../Notes/Documentation/other.html#margin">margin comments</a>
+    sparingly.
+  </li>
+  <li>
+    Avoid <a href="../../Notes/Standards/other.html#dup">code duplication</a>.
+  </li>
+  <li>
+    <a href="../../Notes/Standards/other.html#eol">End the last line</a>.
+  </li>
+  <li>
+    Do not use <a href="../../Notes/Standards/variable.html#global">global
+    or static variables</a>.
+  </li>
+  <li>
+    Every body of an if-statement, loop, etc. must be a
+    <a href="../../Notes/Standards/Structure/component.html#compound">compound statement.</a>
+  </li>
+  <li>
+    Do not use 
+    <a href="../../Notes/Standards/Structure/conditional.html#redundant">redundant tests</a>
+    in if-statements.
+  </li>
+  <li>
+    If code is only performed at the end of the last iteration of a loop,
+    then it should be written 
+    <a href="../../Notes/Standards/Structure/loop.html#loop-end">after the loop</a>.
+  </li>
+</ul>
+<p></p>
+
+
+<hr>
+<a name="design"></a>
+<h2>Design Issues</h2>
+
+<p>The <span class="term">design</span> of a program 
+includes issues such as which functions
+it includes, how those functions are organized into modules, 
+and what each function and module accomplishes.
+It normally does not include details of how each function works.
+</p>
+
+<p>For this assignment, there should be only one file (or 
+<i>module</i>).  It must be called <b>hailstone.cpp.
+</b></p><b>
+
+<p>This is an exercise in using C++, 
+not an attempt to design the most efficient
+possible solution to this problem.  Your design is required to use
+the following functions.
+Do not try to fold all of these functions together into one.
+Do not modify what each function is supposed to do.  Make it do what is 
+called for.
+</p>
+
+<p></p><ol>
+  <li><p><b>Include a function that computes the value that follows a given
+  value <i>n</i> in the hailstone sequence.</b>  If you call it <b>next</b>,
+  then next(7) = 22 and next(22) = 11.  Any time you want to get the
+  next number in the sequence, you <b><i>must</i></b> use this function.
+  </p></li>
+
+  <li><p><b>Include a function that takes an integer <i>n</i> and
+  writes the hailstone sequence starting at <i>n</i> on one line on the standard output,
+  separating the numbers by spaces.</b>  This function should not print
+  a newline character.  Make the return type <b>void</b>, indicating
+  that it does not yield an answer, it just does something.
+  </p></li>
+
+  <li><p>Include a function that takes an integer <i>n</i> and returns
+  the length of the hailstone sequence starting at <i>n</i>.
+  For example, if this function is called hailstoneLength, then you
+  will find that hailstoneLength(3) = 8, hailstoneLength(4) = 3 and
+  hailstoneLength(1) = 1.
+  </p></li>
+
+  <li><p><b>Include a function that takes an integer <i>n</i> and returns
+  the largest number in the hailstone sequence starting at <i>n</i>.</b>
+  For example, if this function is called hailstoneLargest, then
+  you should find that hailstoneLargest(3) = 16 and
+  hailstoneLargest(4) = 4.
+  </p></li>
+
+  <li><p><b>Include a function that takes an integer <i>n</i> and returns
+  the number of local maxima in the hailstone sequence starting at
+  <i>n</i></b>. 
+  </p></li>
+
+  <li><p><b>Include a function that takes an integer <i>n</i> and
+  returns the length of the longest hailstone sequence that starts
+  with a number from 1 to <i>n</i>.</b>  For example, if this function
+  is called hailstoneLargestLength, then 
+  hailstoneLargestLength(3) = 8 and
+  hailstoneLargestLength(10) = 20.
+  </p></li>
+
+  <li><p><b>Include a main program that interacts with the user, asking
+  for the start number <i>n</i>, and then writing the results.</b>
+  </p></li>
+
+  <li><p>You can include any other functions that you find helpful.
+  But you must at least include the functions described above.
+  </p></li>
+</ol><p></p>
+
+<p>For this program, use loops.  Do not use recursion.
+</p>
+
+
+<hr>
+<a name="run"></a>
+<h2>Compiling and Testing Your Program</h2>
+
+<p>Get file <a href="Makefile">Makefile</a> and put it in
+the same directory as your program.  Then, to compile your
+program, it suffices to perform command
+</p><pre>  make
+</pre>
+To run it, use command
+<pre>  make run
+</pre>
+To run it via <a href="../../Notes/Debug/debugger.html">gdb</a>, use command
+<pre>  make debug
+</pre>
+To remove all machine-generated files, use
+<pre>  make clean
+</pre>
+<p></p>
+
+
+<hr>
+<a name="plan"></a>
+<h2>A Development Plan</h2>
+
+<p>For a large piece of software, it is critical to have a development plan.
+You simply cannot write the whole thing and then begin testing.
+This assignment is not a large piece of software, but it is a good idea
+to become familiar with development plans on smaller programs rather than
+being thrown into them on your first large program. 
+</p>
+
+<p>Here is a suggestion for steps to get this done.  It uses an approach
+called <i>successive refinement</i>, where you write a little bit, test
+it, write a little more, test that, and so on.
+</p>
+
+<p></p></b><ol><b>
+  <li><p>Create a directory to hold assignment 1.
+  </p></li>
+
+  <li><p>Get the <a href="../../Notes/Standards/template.txt">template</a>
+  and modify it.  Put in your name.  
+  If you intend to use tabs, also include a comment telling how often there
+  is a tab stop.  For example,
+<b></b></p><pre><b>  // tab stops: every 4 characters
+</b></pre>
+  says that a tab moves 4 characters.
+  <p></p>
+
+  </li></b><li><b><p><b>Write the <b>next</b> function.</b>
+  Write a contract, the heading and the body.  Make it following the coding standards.
+  Make sure this function definition is well indented <i>before</i> you
+  test it.  Keep every function well indented while you work on it.
+  </p>
+
+  <p><b>Now test it.</b>
+  Write a main program that just computes next of a few values, and
+  checks that they are right.  Here is a sample main program.
+</p><pre class="ccode">#include &lt;cstdio&gt;
+using namespace std;
+...
+int main()
+{
+   printf("next(3)  = %i\n", next(3));
+   printf("next(7)  = %i\n", next(7));
+   printf("next(22)  = %i\n", next(22));
+   printf("next(44)  = %i\n", next(44));
+   return 0;
+}
+</pre></b>
+  Write main at the bottom of the program.
+  In C++, you need to define a function 
+  (or provide other information about it)
+  before it is used
+  <p></p><hr></li>
+
+  <li><p><b>Write the function that prints the entire sequence.</b>
+  Make sure that it is well indented and readable.
+  Include a contract.
+  Be sure that it uses the <b>next</b> function to compute 
+  the next value.
+  Check it by doing a hand simulation.
+  </p>
+
+  <p>Modify your main program so that it now reads a number <i>n</i> from the
+  user and prints the hailstone sequence starting at <i>n</i>.
+  Your main program might look as follows.
+<b></b></p><pre><b>#include &lt;cstdio&gt;
+using namespace std;
+...
+int main()
+{
+  int n;
+  printf("What number should I start with? ");
+  scanf("%i", &amp;n);
+
+  printf("The hailstone sequence starting at %i is\n", n);
+  printHailstoneSequence(n);
+  printf("\n");
+
+  return 0;
+}
+</b></pre>
+  Test it.
+  <p></p><hr></li>
+
+  <li><p><b>Write the function that computes the length of the hailstone sequence
+  starting at <i>n</i>.</b>
+  Make sure it is well indented and readable and has a clear and concise
+  contract.  Check it by doing a hand
+  simulation.  Modify main so that it shows both the hailstone sequence
+  and its length.  Test it.
+  </p>
+  <p></p><hr></li>
+
+
+  <li><p><b>Write the function that computes the largest number in the sequence.</b>
+  Keep it well indented and readable.  Include a contract.
+  Check it by doing a hand simulation.
+  Augment your main program to use that function.  Test it.
+  </p><hr></li>
+
+  <li><p><b>Write the function that computes the length of the longest
+  hailstone sequence for any starting value from 1 to <i>n</i>.</b>
+  Make it well indented and readable, and include a contract.
+  Augment the main program to show that information.  Test it.
+  </p><hr></li>
+
+  <li><p><b>Write the function that computes the number of local maxima.</b>
+  Keep it well indented and readable, and include a contract.  
+  Check it by doing a hand simulation.
+  Augment the main program to show that information.  Test it.
+  </p><hr></li>
+
+  <li><p><b>At this point you should have a working programs that is well
+  documented, well indented and readable.</b>
+  Submit your program.  See below for how to do that.
+  </p></li>
+
+</ol><p></p>
+
+<hr>
+<a name="submit"></a>
+<h2>Submitting Your Work</h2>
+
+<p>You must submit your program using the following method.  Email submissions
+will not be accepted.  An excuse that you do not know how to use Linux will
+not be accepted.
+</p>
+
+<p>To turn in version (a), log into one of the Linux machines, change
+your directory to the one that holds your programs, and do the
+following command.
+<b></b></p><pre><b>  ~abrahamsonk/3300/bin/submit 1a hailstone.cpp
+</b></pre>
+To turn in version (b), do the following.
+<b><pre>  ~abrahamsonk/3300/bin/submit 1b hailstone.cpp
+</pre></b>
+After submitting, you should receive confirmation that the
+submission was successful.  If you do not receive confirmation,
+assume that the submission did not work.
+<p></p>
+
+<p>You can do repeated submissions.  New submissions will replace
+old ones.
+</p>
+
+<hr>
+<a name="late"></a>
+<h2>Late submissions</h2>
+
+<p>Late submissions on version (a) will be accepted for one day after
+the due date.  Late submissions for version (b) will be accepted for
+three days after the due date.  If you miss a late submission deadline
+by a microsecond, your work will not be accepted.
+</p>
+
+
+<p>&nbsp;</p>
+<p>&nbsp;</p>
+<p>&nbsp;</p>
+
+
+</body></html>Ytext/htmlUUTF-8_Hhttp://www.cs.ecu.edu/karl/3300/spr15/assignments/Assignment1/assn1.htmlP°‘_WebResourceResponseOıbplist00‘bcX$versionX$objectsY$archiverT$top Ü†Ø#)*0123IJKLMNOPQRSTUVWXY]U$null›	
+ !"R$6S$10R$2R$7R$3S$11R$8V$classR$4R$9R$0R$5R$1Ä	ÄÄÄ ÄÄÄÄ”$%'(WNS.base[NS.relativeÄ ÄÄ_.http://www.cs.ecu.edu/karl/3300/spr15/3300.css“+,-.Z$classnameX$classesUNSURL¢-/XNSObject#AæÎ	9UQ◊ »”456?HWNS.keysZNS.objects®789:;<=>Ä	Ä
+ÄÄÄÄÄÄ®@BCDEFGÄÄÄÄÄÄÄÄÄVServer\Content-TypeTEtag]Last-ModifiedTDate]Accept-Ranges^Content-LengthZConnection_Apache/2.2.3 (Red Hat)Xtext/css_"64001-3c8-e9230000"_Fri, 09 Jan 2015 01:16:48 GMT_Sun, 26 May 2030 22:37:28 GMTUbytesS968Uclose“+,Z[_NSMutableDictionary£Z\/\NSDictionary“+,^__NSHTTPURLResponse£`a/_NSHTTPURLResponse]NSURLResponse_NSKeyedArchiver—de_WebResourceResponseÄ    # - 2 7 U [ v y } Ä É Ü ä ç î ó ö ù † £ • ß © ´ ≠ Æ ∞ ≤ ¥ ∂ ∏ ∫ º √ À ◊ Ÿ € ›'-09BDFMU`ikmoqsuwyÇÑÜàäåéêíîõ®≠ª¿Œ›Ë
+!Aagkqvåêù¢∂∫Œ‹ÓÒ             f              	O»h1	{color: black; 
+         text-align: center
+        }
+h2	{color: #0000D0; 
+         text-align: center
+        }
+h3	{color: #0000D0; 
+         text-align: left
+        }
+body	{background-color: white; 
+         color: black; 
+         margin: 15px
+        }
+sub	{font-size: 80%}
+sup	{font-size: 80%}
+dt	{color: #D00000; 
+         font-weight: bold
+        }
+.ccode	{color: #903000; 
+         font-weight: bold
+        }
+.bcode	{color: #FF0000}
+.tab	{background-color: #A0A0FF}
+.term	{color: blue; 
+         font-style: italic
+        }
+.small  {
+         font-size: smaller
+        }
+.write  {color: #D00000}
+
+.red {
+        color: red
+}
+.darkred {
+        color: #D00000
+}
+.th	  {
+  background-color: #C090E8;
+  text-align: center
+}
+A:link    {
+  color: blue;   
+  text-decoration: none
+}
+A:visited {
+  color: #9900FF;   
+  text-decoration: none
+}
+A:active  {
+  color: red;    
+  text-decoration: underline
+}
+A:hover {
+  color: red;
+  text-decoration: underline
+}
+Xtext/css_.http://www.cs.ecu.edu/karl/3300/spr15/3300.css    1 < N d Ç ë ®@)@3@9@Ñ@Ö@á@ê@¶DüHkHt                           H•

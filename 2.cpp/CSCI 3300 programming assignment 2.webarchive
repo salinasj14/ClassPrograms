@@ -1,0 +1,294 @@
+bplist00“_WebMainResource_WebSubresources’	
+_WebResourceData_WebResourceMIMEType_WebResourceTextEncodingName^WebResourceURL_WebResourceFrameNameO}<html><head>
+  <title>CSCI 3300 programming assignment 2</title>
+  <link rel="stylesheet" href="../../3300.css" type="text/css">
+<style type="text/css"></style><style></style></head>
+
+<body>
+<h1>
+  Computer Science 3300<br>
+  Spring 2015<br>
+  Section 001<br>
+  Programming Assignment 2<br>
+</h1>
+
+<p></p><div align="center"><table>
+  <tbody><tr>
+    <td><b>Assigned:</b></td>
+    <td>Monday, February 2</td>
+  </tr>
+  <tr>
+    <td><b>Version (a) due:</b></td>
+    <td>Monday, February 9, 11:59pm</td>
+  </tr>
+  <tr>
+    <td><b>Version (b) due:</b></td>
+    <td>Saturday, February 28, 11:59pm</td>
+  </tr>
+</tbody></table>
+</div><p></p>
+
+
+<h3>Table of contents</h3>
+
+<p></p><ol>
+  <li><a href="#assignment">The assignment</a></li>
+  <li><a href="#hints">Hints</a></li>
+  <li><a href="#plan">A development plan</a></li>
+  <li><a href="#infinite">Infinite recursion</a></li>
+  <li><a href="#submit">Submitting your work</a></li>
+  <li><a href="#late">Late submissions</a></li>
+</ol><p></p>
+
+<hr>
+<a name="assignment"></a>
+<h2>The Assignment</h2>
+
+<p>This assignment has the same requirements as 
+<a href="../Assignment1/assn1.html">assignment 1</a>.
+However, for this assignment, <b><i>do not use any loops</i></b>.
+Use recursion instead.
+</p>
+
+<p><b>For this assignment, no function is allowed to change the
+value of <i>any variable</i>, once that variable has been given
+a value.</b>
+</p>
+
+<p>Your main function and your function that computes the next
+number in the sequence should be identical to what the are in assignment 1.
+</p>
+
+<p>Use the same Makefile as you used for assignment 1.
+</p>
+
+
+<hr>
+<a name="hints"></a>
+<h2>Hints</h2>
+
+<p>Think about how each function
+can help itself.  Here are some suggestions.
+</p>
+
+<p></p><ol>
+  <li><p>Suppose that you want to find the length of
+   the hailstone sequence starting at 7.  If you ask for the length
+   of the hailstone sequence starting at 22 (result: 16), how would you 
+   determine the length of the sequence starting at 7?  
+   </p>
+
+   <p>Handle the length of the sequence starting at 1 as a special case.
+   Use an if-statement to decide whether this is the special case of 1
+   or not.
+   </p></li>
+
+   <li><p>Suppose that you want to know the largest number in
+   the sequence starting at 7.  Ask for the largest number in the
+   sequence starting at 22.  (The answer is 52).  The largest number
+   is clearly the larger of 7 and 52.  As another example, suppose that
+   you want to know the largest number in the sequence starting at 52.
+   Ask for the largest number in the sequence starting at 26.  The
+   answer is 40.  What you want is the larger of 52 and 40, clearly 52.
+   </p>
+
+   <p><b>Important Note.</b> In terms of efficiency, recursion acts as
+   an amplifier.  Algorithm designers use it because, if they
+   think of a clever idea and they use it in a recursive definition,
+   recursion amplifies it into a very efficient algorithm.  But recursion
+   also amplifies bad ideas.  If you do something in a slopply way in
+   a recursive function, recursion can amplify it and make a very
+   slow algorithm.  In particular, if you do the same recursive call
+   twice, which is a waste of time, recursion will be <i>very</i> slow.
+   Try your program on input 31.  Does it respond quickly, or is it
+   really slow?
+   </p></li>
+
+   <li><p>
+     To count the local maxima, create a <span class="term">helper function</span>
+     that takes two parameters, <i>prev</i> and <i>n</i>.  It should
+     compute the number of local maxima in the hailstone sequence starting
+     at <i>n</i>, assuming that the value that comes before <i>n</i>
+     is <i>prev</i>.  There needs to be a special value for <i>prev</i> that
+     indicates no prior value.  Be sure to document your choice for that.
+     </p>
+
+     <p>For example, if the helper function is
+     hailstoneLocalMaximaHelper(<i>prev</i>, <i>n</i>), then
+     hailstoneLocalMaximaHelper(22,11) should return 4.  (It counts the
+     number of local maxima in sequence [22, 11, 34, 17, 52, 26, 13,
+     40, 20, 10, 5, 16, 8, 4, 2, 1], from the 11 to the end.  The 22 comes
+     before the sequence, so it is no counted.)
+     </p>
+
+     <p>You still need to provide a function that only takes one parameter
+     and yields the number of local maxima.  Make it call the helper function.
+     </p>
+   <p></p></li>
+</ol><p></p>
+
+<hr>
+<a name="plan"></a>
+<h2>A Development Plan</h2>
+
+<p>Use successive refinement. Here is a plan.
+</p>
+
+<ol>
+  <li><p>
+    Create a directory to hold assignment 2.  Copy your program from assignment
+    1 into that directory.  Remove the bodies of the functions that need to
+    be rewritten.  Do not remove the contracts or function headings. 
+    Do not remove the bodies of next
+    or main.  Turn each function with an empty body into a <span class="term">stub</span>.
+    If it returns an integer, just make it return 0.  If it does not return an answer,
+    leave the body empty.
+  </p></li>
+
+  <li><p><b>Write the function that prints the entire sequence.</b>
+  Make sure that it is well indented and readable.  Test it.  (Note that
+  the results from functions that are only stubs will be 0.  That is not
+  a problem at this point.)
+  </p></li>
+
+  <li><p><b>Write the function that computes the length of the hailstone sequence
+  starting at <i>n</i>.</b>
+  Make sure it is well indented and readable.  Test it.
+  </p><hr></li>
+
+  <li><p><b>Write the function that computes the largest number in the sequence.</b>
+  Keep it well indented and readable.  Test it.
+  </p><hr></li>
+
+  <li><p><b>Write the function that computes the length of the longest
+  hailstone sequence for any starting value from 1 to <i>n</i>.</b>
+  Make it well indented and readable.  Test it.
+  </p><hr></li>
+
+  <li><p><b>Write the function that computes the number of local maxima.</b>
+  Keep it well indented and readable.  Test it.
+  </p><hr></li>
+</ol>
+
+
+<hr>
+<a name="infinite"></a>
+<h2>Infinite recursion</h2>
+
+<p>One problem that you might encounter is an infinite recursion,
+where a function keeps calling itself with the same value until
+the program runs out of memory.  If you run the debugger
+with an infinite
+recursion, try to stop the program with control-C before it
+has produced too many copies of your function.  If you do a backtrace and gdb says
+the run-time stack is corrupt, or that there is no run-time
+stack, then it means that you have run
+out of memory.  Try slowing down your function by making it
+write something.
+Then you will be able to stop it before too
+many copies have been created.
+Since you are using successive
+refinement, you will know which function is at fault.  It will
+be the one that you just added.
+</p>
+
+
+
+<hr>
+<a name="submit"></a>
+<h2>Submitting Your Work</h2>
+
+<p>You must submit your program using the following method.  Email submissions
+will not be accepted.  An excuse that you do not know how to use Linux will
+not be accepted.
+</p>
+
+<p>To turn in version (a), log into one of the Linux machines, change
+your directory to the one that holds your programs, and do the
+following command.
+<b></b></p><pre><b>  ~abrahamsonk/3300/bin/submit 2a hailstone.cpp
+</b></pre>
+To turn in version (b), do the following.
+<b><pre>  ~abrahamsonk/3300/bin/submit 2b hailstone.cpp
+</pre></b>
+After submitting, you should receive confirmation that the
+submission was successful.  If you do not receive confirmation,
+assume that the submission did not work.
+<p></p>
+
+<hr>
+<a name="late"></a>
+<h2>Late submissions</h2>
+
+<p>Late submissions on version (a) will be accepted for one day after
+the due date.  Late submissions for version (b) will be accepted for
+three days after the due date.  If you miss a late submission deadline
+by a microsecond, your work will not be accepted.
+</p>
+
+<p>&nbsp;</p>
+<p>&nbsp;</p>
+<p>&nbsp;</p>
+
+
+</body></html>Ytext/htmlUUTF-8_Hhttp://www.cs.ecu.edu/karl/3300/spr15/assignments/Assignment2/assn2.htmlP°‘_WebResourceResponseOıbplist00‘bcX$versionX$objectsY$archiverT$top Ü†Ø#)*0123IJKLMNOPQRSTUVWXY]U$null›	
+ !"R$6S$10R$2R$7R$3S$11R$8V$classR$4R$9R$0R$5R$1Ä	ÄÄÄ ÄÄÄÄ”$%'(WNS.base[NS.relativeÄ ÄÄ_.http://www.cs.ecu.edu/karl/3300/spr15/3300.css“+,-.Z$classnameX$classesUNSURL¢-/XNSObject#AæÎ	r58& »”456?HWNS.keysZNS.objects®789:;<=>Ä	Ä
+ÄÄÄÄÄÄ®@BCDEFGÄÄÄÄÄÄÄÄÄVServer\Content-TypeTEtag]Last-ModifiedTDate]Accept-Ranges^Content-LengthZConnection_Apache/2.2.3 (Red Hat)Xtext/css_"64001-3c8-e9230000"_Fri, 09 Jan 2015 01:16:48 GMT_Sun, 26 May 2030 22:37:28 GMTUbytesS968Uclose“+,Z[_NSMutableDictionary£Z\/\NSDictionary“+,^__NSHTTPURLResponse£`a/_NSHTTPURLResponse]NSURLResponse_NSKeyedArchiver—de_WebResourceResponseÄ    # - 2 7 U [ v y } Ä É Ü ä ç î ó ö ù † £ • ß © ´ ≠ Æ ∞ ≤ ¥ ∂ ∏ ∫ º √ À ◊ Ÿ € ›'-09BDFMU`ikmoqsuwyÇÑÜàäåéêíîõ®≠ª¿Œ›Ë
+!Aagkqvåêù¢∂∫Œ‹ÓÒ             f              	O»h1	{color: black; 
+         text-align: center
+        }
+h2	{color: #0000D0; 
+         text-align: center
+        }
+h3	{color: #0000D0; 
+         text-align: left
+        }
+body	{background-color: white; 
+         color: black; 
+         margin: 15px
+        }
+sub	{font-size: 80%}
+sup	{font-size: 80%}
+dt	{color: #D00000; 
+         font-weight: bold
+        }
+.ccode	{color: #903000; 
+         font-weight: bold
+        }
+.bcode	{color: #FF0000}
+.tab	{background-color: #A0A0FF}
+.term	{color: blue; 
+         font-style: italic
+        }
+.small  {
+         font-size: smaller
+        }
+.write  {color: #D00000}
+
+.red {
+        color: red
+}
+.darkred {
+        color: #D00000
+}
+.th	  {
+  background-color: #C090E8;
+  text-align: center
+}
+A:link    {
+  color: blue;   
+  text-decoration: none
+}
+A:visited {
+  color: #9900FF;   
+  text-decoration: none
+}
+A:active  {
+  color: red;    
+  text-decoration: underline
+}
+A:hover {
+  color: red;
+  text-decoration: underline
+}
+Xtext/css_.http://www.cs.ecu.edu/karl/3300/spr15/3300.css    1 < N d Ç ë ®)39ÑÖáê¶#ü'k't                           '•

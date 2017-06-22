@@ -1,0 +1,976 @@
+bplist00“_WebMainResource_WebSubresources’	
+_WebResourceData_WebResourceMIMEType_WebResourceTextEncodingName^WebResourceURL_WebResourceFrameNameOo∂<html><head>
+  <title> CSCI 3300 programming assignment 6 </title>
+  <link rel="stylesheet" href="../../3300.css" type="text/css">
+<style type="text/css"></style><style></style></head>
+
+<body>
+
+<h1> 
+  Computer Science 3300<br>
+  Spring 2015<br>
+  Section 001<br>
+  Programming Assignment 6
+</h1>
+
+<p></p><div align="center"><table>
+  <tbody><tr>
+    <td><b>Assigned:</b></td>
+    <td>Wednesday, March 25</td>
+  </tr>
+  <tr>
+    <td><b>Intermediate version due:</b></td>
+    <td>Thursday, April 2, 11:59pm</td>
+  </tr>
+  <tr>
+    <td><b>Version (a) due:</b></td>
+    <td>Thursday, April 9, 11:59pm</td>
+  </tr>
+  <tr>
+    <td><b>Version (b) due:</b></td>
+    <td>Saturday, April 25, 11:59pm</td>
+  </tr>
+</tbody></table>
+</div><p></p>
+
+<hr>
+
+<h3>Table of contents</h3>
+
+<p></p><ol>
+  <li><a href="#background">Background</a></li>
+  <li><a href="#requirements">Requirements</a></li>
+  <li><a href="#algorithm">Algorithmic issues</a></li>
+  <li><a href="#trace">Tracing</a></li>
+  <li><a href="#implementation">Implementation issues and a development plan</a></li>
+  <li><a href="#intermediate">Intermediate version</a></li>
+  <li><a href="#submit">Submitting your work</a></li>
+  <li><a href="#late">Late submissions</a></li>
+</ol><p></p>
+
+<hr>
+<a name="background"></a>
+<h2>Background</h2>
+
+<p>Data compression is a way of finding economical ways to
+encode information, for storing files using limited disk space,
+or for transfering files over a network.  
+Data compression is critical for transmitting videos over the
+internet.
+Sophisticated data compression algorithms
+for text files take into account sequences of characters that
+occur often, so that they can encode those sequences in an
+efficient way.  For example, if the word <i>Rumpelstiltskin</i>
+occurs often, then there will be a very short code for that word.
+</p>
+
+<p>A very simple kind of data compression for text files works
+on individual characters, without paying attention to how characters
+are grouped.  This assignment has to do with that simple form
+of data compression, using an algorithm called Huffman coding.
+</p>
+
+<p>A file is a sequence of bits.  Codes such as Ascii and Unicode
+use a fixed number of bits to encode each character.  For example,
+in the 8-bit Ascii code, the letters 'a', 'b' and 'c' have the following
+encodings.
+</p>
+
+<p></p><div align="center">
+  <table>
+    <tbody><tr><td>'a'</td> <td>&nbsp;</td> <td>01100001</td></tr>
+    <tr><td>'b'</td> <td>&nbsp;</td> <td>01100010</td></tr>
+    <tr><td>'c'</td> <td>&nbsp;</td> <td>01100011</td></tr>
+  </tbody></table>
+</div><p></p>
+
+<p>In the 16 bit Unicode standard, the codes for 'a', 'b' and 'c' are
+as follows.
+</p>
+
+<p></p><div align="center">
+  <table>
+    <tbody><tr><td>'a'</td> <td>&nbsp;</td> <td>0000000001100001</td></tr>
+    <tr><td>'b'</td> <td>&nbsp;</td> <td>0000000001100010</td></tr>
+    <tr><td>'c'</td> <td>&nbsp;</td> <td>0000000001100011</td></tr>
+  </tbody></table>
+</div><p></p>
+
+<p>Some characters are used more than others.  For an economical
+encoding, instead of using the same number of bits for every character,
+it would be better to use shorter codes for characters that
+occur more frequently.  For example, suppose that a document 
+contains only the letters <i>a</i>, <i>b</i> and <i>c</i>,
+and suppose that the letter <i>b</i> occurs far more often than
+either <i>a</i> or <i>c</i>.
+An alternative character encoding is as follows.
+</p>
+
+<p></p><div align="center">
+  <table>
+    <tbody><tr><td>'a'</td> <td>&nbsp;</td> <td>10</td></tr>
+    <tr><td>'b'</td> <td>&nbsp;</td> <td>0</td></tr>
+    <tr><td>'c'</td> <td>&nbsp;</td> <td>11</td></tr>
+  </tbody></table>
+</div><p></p>
+
+<p>This code has the property that no character code is a prefix
+of any other character code.  Using this kind of character code
+(called a <i>prefix code</i>) allows you to break apart a string of bits
+into the characters that it encodes.  For example, string of bits
+"01001110" encodes "babca".  To decode a string,
+you repeatedly remove a prefix that encodes a character.  Since no code is
+a prefix of any other code, there is only one way to select the next character.
+</p>
+
+<hr>
+<a name="requirements"></a>
+<h2>Requirements</h2>
+
+<p>For this assignment you will write two programs.
+</p>
+
+<p>The first program, called <i>huffman</i>,
+gets two file names, which I will refer to as <i>A</i> and <i>B</i>,
+from the
+<a href="../../Notes/C/Function/main.html"><span class="term">command line</span></a>.
+It should do the following.
+</p>
+
+<ol>
+  <li>
+    <p>Count how many occurrences of each character are in
+    file <i>A</i>.
+    </p>
+  </li>
+
+  <li>
+    <p>If requested, show the character frequencies on the standard output,
+    showing only characters that occur at least once.
+    </p>
+  </li>
+
+  <li>
+    <p>Construct a Huffman code for the characters that
+    occur in file <i>A</i> (ignoring characters that do not
+    occur at all).
+    </p>
+  </li>
+
+  <li>
+    <p>If requested, write the code on the standard output.
+    </p>
+  </li>
+  <li>
+    <p>Reread file <i>A</i> and, using the constructed
+    Huffman code, write an encoded version of file <i>A</i>
+    into file <i>B</i>.
+    </p>
+  </li>
+</ol>
+
+<p>For example, command
+<b></b></p><pre><b>  ./huffman data.txt data.cmp
+</b></pre>
+reads file data.txt and writes a compressed version into
+a file called data.cmp.
+<p></p>
+
+<p>The second program, called <i>unhuffman</i>,
+will also be given two file names,
+<i>A</i> and <i>B</i>, on the command line.
+It reads file <i>A</i>, which
+must be a file that was written by your first program, and
+it writes file <i>B</i>, which should be the decoded version
+of <i>A</i>.  The decoded file should look <i>identical</i> to
+the file that you encoded.
+For example, command
+<b></b></p><pre><b>  ./unhuffman data.cmp newdata.txt
+</b></pre>
+reads data.cmp and writes newdata.txt.
+<p></p>
+
+<hr>
+<a name="algorithm"></a>
+<h2>Algorithmic Issues</h2>
+
+<p>There is an algorithm that is due to Huffman for finding
+efficient prefix codes, called <i>Huffman codes</i>.
+The input to the algorithm is a table of characters with their
+frequencies.
+</p>
+
+<h3>Trees and codes</h3>
+
+<p>A <span class="term">tree</span> is used to define a prefix code.  Each
+<span class="term">node</span> of the tree is either a leaf or a nonleaf.
+Each leaf contains a character.  Each
+nonleaf has two <span class="term">children</span>, the left child and the
+right child.  We also think of the left child as the '0' child and
+the right child as the '1' child.
+An example is the following tree.
+</p><pre>               .
+              / \
+            0/   \1
+            /     \
+           /       \
+          .         .
+         / \       / \
+       0/   \1   0/   \1
+       /     \   /     \
+      c      b   a      d                         
+</pre>
+A tree defines a code as follows.  You find the code for a character by following
+the path from the top (the <span class="term">root</span>) of the tree to that 
+character, writing down the 0's and 1's that you see along the path.  For example,
+in the tree above,
+the code for 'b' is 01 and the code for 'a' is 10.  What is the code
+for 'c'?  
+A different code is given by the following tree.
+<pre>                    .
+                   / \
+                 0/   \1
+                 /     \
+                b       .
+                       / \
+                     0/   \1
+                     /     \
+                    a       c
+</pre>
+where 'b' has code 0 and 'a' has code 10.
+<p></p>
+
+<p>A tree can be thought of as a <span class="term">composite</span> character.  
+A tree with
+leaves <i>a</i> and <i>c</i> stands for the combination of <i>a</i> and
+<i>c</i>.  A character by itself is thought of as a tree that has
+just one leaf.  
+</p>
+
+<h3>Huffman's algorithm</h3>
+
+<p>The algorithm to create the tree starts by making each character
+into a tree that is just a leaf holding that character.  Each tree has
+a <i>frequency</i>, which is the character frequency that was counted.
+For example, if the frequency counts are
+<font color="darkred"></font></p><pre><font color="darkred">a 500
+b 230
+c 300
+d 250
+e 700
+</font></pre>
+then the algorithm creates five leaves, one holding <i>a</i>, 
+with frequency of 500,
+one holding <i>b</i> with a frequency of 230, etc.  
+<p></p>
+
+<p>(<b>Note.</b>
+A frequency is associated with an entire tree, not with
+each node of a tree.  Initially, each tree has just one
+node, but as the algorithm runs the trees will grow.  You
+still have just one frequency per tree.)
+</p>
+
+<p>Now the algorithm repeatedly performs the following steps, as long as
+there are still at least two trees left in the collection of trees.
+</p>
+
+<p></p><ol>
+  <li><p>Remove the two trees that have the lowest frequencies from the
+  collection of trees.
+  Suppose that they are trees <i>S</i> and <i>T</i>. 
+  Suppose that tree
+  <i>S</i> has frequency <i>F</i><sub><i>S</i></sub>
+  and tree <i>T</i> has frequency <i>F</i><sub><i>T</i></sub>.
+  </p></li>
+
+  <li><p>Build a tree that looks as follows.
+</p><pre>              .
+             / \
+           0/   \1
+           /     \
+          <i>S</i>       <i>T</i>
+</pre>
+  Say that this tree has frequency 
+  <i>F</i><sub><i>S</i></sub> + <i>F</i><sub><i>T</i></sub>, the sum of
+  the frequencies of <i>S</i> and T.
+  <p></p></li>
+
+  <li><p>Add the new tree, with its new frequency, to the collection
+  of trees.
+  </p></li>
+</ol><p></p>
+
+<p>The number of trees decreases each time because you remove two trees
+and put back just one tree.  
+When there is only one tree left, the algorithm is done.
+That tree is the result.
+</p>
+
+<h3>A notation for trees</h3>
+
+<p>It is a little awkward to draw pictures of the trees, so a
+notation for describing trees is useful.  A leaf is shown as
+the character at that leaf.  A nonleaf is shown as the two
+subtrees, surrounded by parenthese and separated by a comma.
+For example, tree
+</p><pre>                   .
+                  / \
+                0/   \1
+                /     \
+               e       c
+</pre>
+is written (e,c).  Tree
+<pre>                    .
+                   / \
+                 0/   \1
+                 /     \
+                b       .
+                       / \
+                     0/   \1
+                     /     \
+                    a       c
+</pre>
+is written (b,(a,c)).  Tree
+<pre>               .
+              / \
+            0/   \1
+            /     \
+           /       \
+          .         .
+         / \       / \
+       0/   \1   0/   \1
+       /     \   /     \
+      c      b   a      d                         
+</pre>
+is written ((c,b),(a,d)).  We use this notation to demonstrate
+the algorithm.
+<p></p>
+
+<h3>Example</h3>
+
+<p>Suppose there are five letters, <i>a</i>, <i>b</i>, <i>c</i> <i>d</i>
+and <i>e</i>.
+After counting the characters in a document, you get the following counts.
+</p>
+
+<p></p><div align="center">
+  <table cellspacing="8">
+     <tbody><tr><td><i>a</i></td> <td>500</td></tr>
+     <tr><td><i>b</i></td> <td>230</td></tr>
+     <tr><td><i>c</i></td> <td>300</td></tr>
+     <tr><td><i>d</i></td> <td>250</td></tr>
+     <tr><td><i>e</i></td> <td>700</td></tr>
+  </tbody></table>
+</div><p></p>
+<p>The initial collection of trees (all leaves) with their frequencies
+is as follows.
+</p>
+
+<p></p><div align="center">
+  <table cellspacing="8">
+     <tbody><tr><td><i>b</i></td> <td>230</td></tr>
+     <tr><td><i>d</i></td> <td>250</td></tr>
+     <tr><td><i>c</i></td> <td>300</td></tr>
+     <tr><td><i>a</i></td> <td>500</td></tr>
+     <tr><td><i>e</i></td> <td>700</td></tr>
+  </tbody></table>
+</div><p></p>
+
+<p>Removing the two with the smallest frequencies and combining them
+yields a tree with frequency 480.
+It is inserted into the collection, yielding the following.
+</p>
+<p></p><div align="center">
+  <table cellspacing="8">
+     <tbody><tr><td><i>c</i></td>               <td>300</td></tr>
+     <tr><td>(<i>b</i>,<i>d</i>)</td>    <td>480</td></tr>
+     <tr><td><i>a</i></td>               <td>500</td></tr>
+     <tr><td><i>e</i></td>               <td>700</td></tr>
+  </tbody></table>
+</div><p></p>
+
+<p>The next step combines <i>c</i> with (<i>b</i>,<i>d</i>), 
+yielding tree (<i>c</i>,(<i>b</i>,<i>d</i>)), with
+a frequency of 300 + 480 = 780.  The collection of trees and
+frequencies is now
+</p>
+<p></p><div align="center">
+  <table cellspacing="8">
+     <tbody><tr><td><i>a</i></td>                          <td>500</td></tr>
+     <tr><td><i>e</i></td>                          <td>700</td></tr>
+     <tr><td>(<i>c</i>,(<i>b</i>,<i>d</i>))</td>    <td>780</td></tr>
+  </tbody></table>
+</div><p></p>
+
+<p>Now combine <i>a</i> and <i>e</i>, yielding
+</p>
+
+<p></p><div align="center">
+  <table cellspacing="8">
+     <tbody><tr><td>(<i>c</i>,(<i>b</i>,<i>d</i>))</td>    <td>780</td></tr>
+     <tr><td>(<i>a</i>,<i>e</i>)</td>               <td>1200</td></tr>
+  </tbody></table>
+</div><p></p>
+
+<p>The last step combines the last two trees, yielding
+</p>
+
+<p></p><div align="center">
+  <table cellspacing="8">
+     <tbody><tr><td>((<i>c</i>,(<i>b</i>,<i>d</i>)),(<i>a</i>,<i>e</i>))</td>        
+     <td>1980</td></tr>
+  </tbody></table>
+</div><p></p>
+
+<p>The final tree is ((<i>c</i>,(<i>b</i>,<i>d</i>)),(<i>a</i>,<i>e</i>)), 
+which is the following tree.
+</p><pre>                    .
+                   / \
+                 0/   \1
+                 /     \
+                /       \
+               .         .
+              / \       / \
+            0/   \1   0/   \1
+            /     \   /     \
+           c       .  a      e 
+                  / \
+                0/   \1
+                /     \
+               b       d
+</pre>
+The code for <i>d</i> is 011, the code for <i>a</i> is 10, etc.
+<p></p>
+
+
+<hr>
+<a name="tracehuffman"></a>
+<h2>Tracing for Huffman</h2>
+
+<p>Create a file <b>trace.cpp</b> that will contain functions
+for tracing.  Also create file <b>trace.h</b> to contain
+prototypes for functions exported by trace.cpp.
+</p>
+
+<p>Add a function to trace.cpp that takes a 
+null-terminated string <i>opt</i>
+and a reference parameter <i>v</i> of type int.  If
+<i>opt</i> is <b>-t1</b>, it should set <i>v</i> to 1.
+If <i>opt</i> is <b>-t2</b>, it should set <i>v</i> to 2.
+Otherwise, it should do nothing.
+</p>
+
+<p>Write main in huffman.cpp so that it sets the trace
+level to 1 if <b>-t1</b> occurs in the command line before
+the first file name, and to level 2 if the command line
+contains <b>-t2</b>.  (If there is no tracing option in
+the command line, the tracing level should be set to 0.)
+
+</p><p>Your huffman program is required to contain tracing as follows.
+</p>
+<ol>
+  <li><p>
+    For trace level 1, the
+    program should write information about character frequencies,
+    show the tree that it produces, and show the code that
+    it gets.
+    For example, the output for a particular
+    file might be as follows.
+<b></b></p><pre><b>The character frequencies are:
+
+a 500
+b 230
+c 300
+d 250
+e 700
+
+The Huffman tree is as follows: ((a,e),(c,(b,d)))
+
+A Huffman code is as follows.
+
+a 10
+b 010
+c 00
+d 011
+e 11
+</b></pre>
+  <p></p></li>
+
+  <li><p>
+   If the tracing level is 2, 
+   the program should do level 1 tracing and it should also
+   show the entire collections of trees, with their frequencies,
+   at the beginning of Huffman's algorithm and after each step.
+  </p></li>
+</ol>
+<p></p>
+
+<hr>
+<a name="implementation"></a>
+<h2>Implementation Issues and a Development Plan</h2>
+
+<p>Start by writing file huffman.cpp, the source code for
+the encoding program <i>huffman</i>.  Do not try to write
+it all and then test it.  Write a little at a time and
+test that part before moving on.
+</p>
+
+<h3>The main function</h3>
+
+<p>Make your main function set the trace level from the
+command line.  As you write more of the program, modify
+main to do more.
+</p>
+
+<h3>Getting the character frequencies</h3>
+
+<p>Write a function to get the character frequencies.  Assume the
+characters in the file are 8-bits (one byte), so there are 256 possible characters.
+See <a href="../../Notes/C/IO/Stdio/stdio-outf.html">writing files using the stdio library</a>
+and <a href="../../Notes/C/IO/Stdio/stdio-inf.html">reading files using the stdio library</a>.
+</p>
+
+<p>Create an array of 256 integers to store the frequency counts, 
+one for each possible character that can be stored in one byte.
+Initially, all of the counts are 0.  Now read each character of the
+file, adding 1 to its count.
+</p>
+
+<p><b>Important.</b> You will be using characters as array indices.
+Do not use type <b>char</b> for an array index.  Characters are
+assumed to be from ‚àí128 to 127.  Read each character
+as an integer.  If you need a character variable, 
+use type <b>unsigned char</b>.
+</p>
+
+<p>Modify the main function in huffman.cpp so that it
+reads the input file, counts the character frequencies and,
+if tracing is requested, shows the frequencies on
+the standard output.
+</p>
+
+
+<h3>Showing the frequencies</h3>
+
+<p>Add a function to trace.cpp that shows the character frequencies on the
+standard output.  It needs to be passed the array of frequencies.
+Make the function show a newline character
+as <i>(newline)</i>, a tab character as <i>(tab)</i> and a space as 
+<i>(space)</i>.
+</p>
+
+<p>Also in trace.cpp, write a function that takes a character
+and writes the character's name to the standard output.
+For example, the name of a newline character is "(newline)".
+The name of 'a' is just "a".  Use it for writing the code.
+</p>
+
+<h3>Trees</h3>
+
+<p>Create a file, <b>tree.h</b>, holding the following type definition.
+</p><pre class="ccode">  enum NodeKind {leaf, nonleaf};
+
+  struct Node {
+    NodeKind kind;
+    char     ch;
+    Node*    left;
+    Node*    right;
+
+    Node(char c)
+    {
+      kind = leaf;
+      ch   = c;
+    }
+    Node(Node* L, Node *R)
+    {
+      kind  = nonleaf;
+      left  = L;
+      right = R;
+    }      
+  };
+</pre>
+<p></p>
+
+<p>The idea is that a leaf has kind <b>leaf</b> and a nonleaf has kind
+<b>nonleaf</b>.  The <i>ch</i> field should only be used in a leaf
+and the <i>left</i> and <i>right</i> fields should only
+be used for a nonleaf.  You will lose points if you use the
+<i>ch</i> field of a nonleaf or the <i>left</i> or
+<i>right</i> fields of a leaf.
+</p>
+
+<p>When you set up your initial trees (each holding just one
+letter) use the first constructor. When you build a composite tree,
+use the second constructor.  For example, statement
+</p><pre class="ccode">   Node* t = new Node('a');
+</pre>
+builds a leaf that contains only the character 'a'.  Statement
+<pre class="ccode">   Node* t = new Node(r,s);
+</pre>
+builds a new tree whose left subtree is <i>r</i> and 
+whose right subtree is <i>s</i>.
+You can tell what kind of tree you are looking at by checking its kind.
+For example, if <i>t</i> has type Node*, you might ask
+<pre class="ccode">   if(t-&gt;kind == nonleaf) 
+   {
+     ...
+   }
+</pre>
+<p></p>
+
+<h3>Showing trees</h3>
+
+<p>Add a function to <b>trace.cpp</b> that prints a tree
+to the standard output, using the notation described above.
+Use it for tracing, as described above.
+</p>
+
+
+<h3>Priority Queues</h3>
+
+<p>For <a href="../Assignment4/assn4.html#pq">Assignment 4</a> you
+implemented the priority queue abstract data type.  Copy that
+implementation into the directory for assignment 6 and modify it
+by defining
+</p><pre class="ccode">  struct Node;
+  typedef Node* PQItemType;
+  typedef int   PQPriorityType;
+</pre>
+<p></p>
+
+<p>After you have counted character frequencies,
+insert each character (as a leaf node of a tree) that
+has a nonzero count, with its
+frequency as its priority, into a priority queue.  
+Now repeatedly remove two trees from the priority queue, combine them into a
+single tree, and insert the new tree back into the priority queue.
+The priority of the new tree is the sum of the priorities of the
+two trees that were combined.
+</p>
+
+<p>Ensure that your algorithm only uses features of the priority
+queue module that are part of its interface.  Do not use
+features that should remain hidden inside the priority queue
+module!  You will lose a lot of points if you use non-exported
+features of the priority queue module.
+</p>
+
+<p>Test what you have by building and, if tracing is requested, printing
+the huffman tree.
+</p>
+
+<a name="intermediate"></a>
+<h3>Intermediate version</h3>
+
+<p>Once the above functions are working,
+submit them as assignment 6i.  Include a
+main function that tests them.  This version should
+count the frequencies, show the frequencies (if requested),
+build the Huffman tree and show the Huffman tree
+(if requested).
+</p>
+
+<h3>Getting the code from the tree</h3>
+
+<p>Now build an array of 256 strings to hold the character codes.
+Use the <a href="../../Notes/C/String/string.html">C++ string</a>
+type to make your job easy.
+Write a function that traverses the tree and stores the code
+for each character into the array.  That function will need to
+have three parameters: the code array (so that it knows where to store
+the codes), the tree <i>t</i> (a subtree of the full huffman tree) and
+a string that is the path from the root of the full huffman tree
+to subtree <i>t</i>.  Now ask yourself how to handle the case
+where <i>t</i> is a leaf and how to handle the case where
+<i>t</i> is a nonleaf.
+</p>
+
+<h3>Echoing the code</h3>
+
+<p>Add a function to trace.cpp that shows the code from the 
+code array.  If tracing is turned on, main should show the code.
+</p>
+
+<p>(Don't show the code while building it.  If you do,
+then any mistake in building the array will not show up
+when you print the code.  Fill in the array first, then
+show what is in it.)
+</p>
+
+<p>As above, show a newline character as <i>(newline)</i>,
+a tab character as <i>(tab)</i> and a space as
+<i>(space)</i>.
+</p>
+
+<h3>Writing the encoded file</h3>
+
+<p>The goal is to pack 8 bits into each byte.  But before
+doing that, take a simpler approach where you write each
+bit as a character so that you can read it.
+After everything seems
+to work, you change the interface so that it writes
+out a binary file instead.
+</p>
+
+<p>Get files 
+<a href="binary.h" type="text/plain">binary.h</a>,
+<a href="binary1.cpp" type="text/plain">binary1.cpp</a> and
+<a href="binary2.cpp" type="text/plain">binary2.cpp</a>.
+They provide the following tools for writing files.
+</p>
+<dl>
+  <dt><p>Type BFILE</p></dt>
+
+  <dt><p>BFILE* openBinaryFileWrite(const char* filename)</p></dt>
+  <dd>This function opens binary file <i>filename</i> for writing
+  and returns a pointer to a structure that describes the open file.
+  It returns NULL if the file cannot be opened.
+  </dd>
+
+  <dt><p>void writeBit(BFILE* f, int b)</p></dt>
+  <dd>This function writes bit <i>b</i> (either 0 or 1)
+  into open file f.  Make sure that <i>b</i> is either
+  0 or 1.  It should not be '0' or '1'.
+  </dd>
+
+  <dt><p>void writeByte(BFILE* f, int b)</p></dt>
+  <dd>This function writes byte or character <i>b</i>.
+  into open file f.
+  </dd>
+
+  <dt><p>void closeBinaryFileWrite(BFILE* f)</p></dt>
+  <dd>This function closes file f.  
+  You must close the file when you are done writing.
+  </dd>
+</dl>
+
+<p>Both files binary1.cpp and binary2.cpp have the same
+interface, described by binary.h.  But binary1.cpp writes
+a text file, writing character '0' to represent bit 0
+and character '1' to represent bit 1.  That makes the
+output file readable.  Module binary2.cpp
+writes the file in binary format.  If you link with
+binary1.cpp you will be able to read the "compressed"
+file using a text editor, but you will not get real compression.
+If you link with binary2.cpp you will get compression but you
+will not be able to read the compressed file using a text editor.
+</p>
+
+<p>Add two functions to huffman.cpp.  The first writes the huffman tree into
+the binary file.  (You will need to do this so that you can get the tree back
+in order to decode the file.)
+</p><ol>
+  <li><p>
+    To write a leaf, write a 1 bit followed by the
+    character stored at the leaf (8 bits).  So, if <i>t</i> is a 
+    leaf, you write <i>t</i> as follows.
+</p><pre class="ccode">  writeBit(f, 1);
+  writeByte(f, t-&gt;ch);
+</pre>
+  <p></p></li>
+
+  <li><p>
+    To write a nonleaf, write a 0 bit followed
+    by the left subtree followed by the right subtree.
+    So, if <i>t</i> is not a leaf, write <i>t</i> as follows, assuming
+    your function is called writeTreeBinary.
+</p><pre class="ccode">  writeBit(f, 0);
+  writeTreeBinary(f, t-&gt;left);
+  writeTreeBinary(f, t-&gt;right);
+</pre>
+  <p></p></li>
+</ol>
+
+<p>Now write a function that reads file <i>A</i> and writes the
+character codes for the characters that are read into an open
+binary file.
+</p>
+
+<p>Finally, write a function that writes the entire compressed file <i>B</i>.
+It should open <i>B</i> as a binary file and <i>A</i> as an ordinary (text)
+file.  Then it should
+write the Huffman tree at the beginning of the file,
+write the codes of the characters in file <i>A</i> and finally
+close the two open files.
+</p>
+
+<hr>
+<a name="trace"></a>
+<h3>Tracing for Unhuffman</h3>
+
+
+<p></p><p>The next step is to write unhuffman.cpp,
+the source code for <i>unhuffman</i>.
+Start by writing a main function in unhuffman.cpp that sets the trace level
+as described earlier.  You will modify it as you add more to
+unhuffman.cpp.
+</p>
+
+<h3>Uncompression</h3>
+
+<p>Use the following
+for reading the binary file, also described by binary.h.
+</p>
+
+<dl>
+  <dt><p>BFILE* openBinaryFileRead(const char* filename)</p></dt>
+  <dd>This function opens binary file <i>filename</i> for reading
+  and returns a pointer to a structure that describes the open file.  It returns NULL
+  if the file cannot be opened.
+  </dd>
+
+  <dt><p>int readBit(BFILE* f)</p></dt>
+  <dd>This function reads one bit from file f and
+  returns the bit (either 0 or 1).  At the end of the
+  file, readBit returns EOF.
+  </dd>
+
+  <dt><p>int readByte(BFILE* f)</p></dt>
+  <dd>This function reads one byte (8 bits) from file f and
+  returns the byte.  Use it to get a byte that you
+  wrote using writeByte.  At the end of the
+  file, readByte returns EOF.
+  </dd>
+
+  <dt><p>void closeBinaryFileRead(BFILE* f)</p></dt>
+  <dd>This function closes file f.  Once it is closed, you
+  cannot read from it again.
+  </dd>
+</dl>
+
+<p>When you link unhuffman.cpp, it is critical that you
+use the same implementation of binary.h as for huffman.cpp.
+Either link both with binary1.cpp or both with binary2.cpp.
+</p>
+
+<p>Write a function that reads a tree.  You will need to
+use it at the beginning of decoding to get the tree back.
+To read a tree, start by reading a bit.  If the bit is a
+1, you are looking at a leaf.  Read the character (a byte)
+and build a leaf holding that character.  But if the bit
+is a 0, then you are looking at a nonleaf.  Just call your
+readTree function twice, once to build the left subtree
+and once to build the right subtree.  Then build the
+whole tree by building a root with those two subtrees.
+You should have recovered the original tree.
+</p>
+
+<p>Modify main to read a tree and, if requested, to
+show it.
+</p>
+
+<p>Now write a function to do the uncompression.
+Use the tree that describes the code.
+As you read each bit, move down the tree in the appropriate
+direction.  When you hit a leaf, write out the character at
+that leaf then start again at the root of the tree to get
+the next character.  Keep going until you hit the end
+of the file.
+</p>
+
+<p><b>Important note.</b> The code for a character only has
+a bit in it for each nonleaf.  There is no bit for a leaf.
+So when reading the code, only read a bit when you are at a
+nonleaf, to decide whether to move to the left or right.  Do
+not read a bit when you are at a leaf.
+</p>
+
+<hr>
+<a name="submit"></a>
+<h2>Submitting Your Work</h2>
+
+<p>To turn in this program, log into Linux.
+Change to the directory that contains those files.
+Then issue one of the following commands.
+</p>
+
+<dl>
+<dt>Intermediate version</dt>
+<dd><p><b><tt>~abrahamsonk/3300/bin/submit 6i huffman.cpp tree.h trace.h trace.cpp pqueue.h pqueue.cpp</tt></b></p>
+
+</dd><dt>First version</dt>
+<dd><p><b><tt>~abrahamsonk/3300/bin/submit 6a huffman.cpp unhuffman.cpp tree.h trace.h trace.cpp pqueue.h pqueue.cpp</tt></b></p>
+
+</dd><dt>Second version</dt>
+<dd><p><b><tt>~abrahamsonk/3300/bin/submit 6b huffman.cpp unhuffman.cpp tree.h trace.h trace.cpp pqueue.h pqueue.cpp</tt></b></p>
+</dd></dl>
+
+<hr>
+<a name="late"></a>
+<h2>Late submissions</h2>
+
+<p>Late submissions on version (a) will be accepted for one day after
+the due date.  Late submissions for version (b) will be accepted for
+three days after the due date.  If you miss a late submission deadline
+by a microsecond, your work will not be accepted.
+</p>
+
+<p>&nbsp;</p>
+<p>&nbsp;</p>
+<p>&nbsp;</p>
+<p>&nbsp;</p>
+<p>&nbsp;</p>
+
+
+</body></html>Ytext/htmlUUTF-8_Hhttp://www.cs.ecu.edu/karl/3300/spr15/assignments/Assignment6/assn6.htmlP°‘_WebResourceResponseOıbplist00‘bcX$versionX$objectsY$archiverT$top Ü†Ø#)*0123IJKLMNOPQRSTUVWXY]U$null›	
+ !"R$6S$10R$2R$7R$3S$11R$8V$classR$4R$9R$0R$5R$1Ä	ÄÄÄ ÄÄÄÄ”$%'(WNS.base[NS.relativeÄ ÄÄ_.http://www.cs.ecu.edu/karl/3300/spr15/3300.css“+,-.Z$classnameX$classesUNSURL¢-/XNSObject#AæÎ	ßF‚ »”456?HWNS.keysZNS.objects®789:;<=>Ä	Ä
+ÄÄÄÄÄÄ®@BCDEFGÄÄÄÄÄÄÄÄÄVServer\Content-TypeTEtag]Last-ModifiedTDate]Accept-Ranges^Content-LengthZConnection_Apache/2.2.3 (Red Hat)Xtext/css_"64001-3c8-e9230000"_Fri, 09 Jan 2015 01:16:48 GMT_Sun, 26 May 2030 22:37:28 GMTUbytesS968Uclose“+,Z[_NSMutableDictionary£Z\/\NSDictionary“+,^__NSHTTPURLResponse£`a/_NSHTTPURLResponse]NSURLResponse_NSKeyedArchiver—de_WebResourceResponseÄ    # - 2 7 U [ v y } Ä É Ü ä ç î ó ö ù † £ • ß © ´ ≠ Æ ∞ ≤ ¥ ∂ ∏ ∫ º √ À ◊ Ÿ € ›'-09BDFMU`ikmoqsuwyÇÑÜàäåéêíîõ®≠ª¿Œ›Ë
+!Aagkqvåêù¢∂∫Œ‹ÓÒ             f              	O»h1	{color: black; 
+         text-align: center
+        }
+h2	{color: #0000D0; 
+         text-align: center
+        }
+h3	{color: #0000D0; 
+         text-align: left
+        }
+body	{background-color: white; 
+         color: black; 
+         margin: 15px
+        }
+sub	{font-size: 80%}
+sup	{font-size: 80%}
+dt	{color: #D00000; 
+         font-weight: bold
+        }
+.ccode	{color: #903000; 
+         font-weight: bold
+        }
+.bcode	{color: #FF0000}
+.tab	{background-color: #A0A0FF}
+.term	{color: blue; 
+         font-style: italic
+        }
+.small  {
+         font-size: smaller
+        }
+.write  {color: #D00000}
+
+.red {
+        color: red
+}
+.darkred {
+        color: #D00000
+}
+.th	  {
+  background-color: #C090E8;
+  text-align: center
+}
+A:link    {
+  color: blue;   
+  text-decoration: none
+}
+A:visited {
+  color: #9900FF;   
+  text-decoration: none
+}
+A:active  {
+  color: red;    
+  text-decoration: underline
+}
+A:hover {
+  color: red;
+  text-decoration: underline
+}
+Xtext/css_.http://www.cs.ecu.edu/karl/3300/spr15/3300.css    1 < N d Ç ë ®pbplprpΩpæp¿p…pﬂtÿx§x≠                           xﬁ

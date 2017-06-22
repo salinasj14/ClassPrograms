@@ -1,0 +1,1463 @@
+bplist00Ò_WebMainResource_WebSubresourcesÕ	
+_WebResourceData_WebResourceMIMEType_WebResourceTextEncodingName^WebResourceURL_WebResourceFrameNameO±¹<html><head>
+  <title> CSCI 3300 programming assignment 7 </title>
+  <link rel="stylesheet" href="../../3300.css" type="text/css">
+<style type="text/css"></style><style></style></head>
+
+<body>
+
+<h1>
+  Computer Science 3300<br>
+  Section 001<br>
+  Spring 2015<br> 
+  Programming Assignment 7
+</h1>
+
+<p></p><div align="center"><table>
+  <tbody><tr>
+    <td><b>Assigned:</b></td>
+    <td>Wednesday, April 8</td>
+  </tr>
+  <tr>
+    <td><b>Intermediate version due:</b></td>
+    <td>Wednesday, April 15, 11:59pm</td>
+  </tr>
+  <tr>
+    <td><b>Full version due:</b></td>
+    <td>Tuesday, April 28, 11:59pm</td>
+  </tr>
+</tbody></table>
+</div><p></p>
+
+<hr>
+
+<h3>Table of contents</h3>
+
+<p></p><ol>
+  <li><a href="#background">Background: graphs and spanning trees</a></li>
+  <li><a href="#requirements">Program requirements</a></li>
+  <li><a href="#algorithm">Algorithmic issues</a></li>
+  <li><a href="#design">Design issues</a></li>
+  <li><a href="#implementation">Implementation issues</a></li>
+  <li><a href="#intermediate">Intermediate version</a></li>
+  <li><a href="#equiv">Handling connections: an abstract data type</a></li>
+  <li><a href="#plan">An implementation plan</a></li>
+  <li><a href="#submit">Submitting your work</a></li>
+  <li><a href="#extra">Extra credit (Read only after you have the program working)</a></li>
+  <li><a href="#kruskal-justification">Why should I believe that 
+  Kruskal's algorithm works? (This is not required for writing the program.)</a></li>
+  <li><a href="#motivation">Motivation for computing minimal spanning 
+  trees (you can skip this)</a></li>
+</ol><p></p>
+
+<hr>
+<a name="background"></a>
+<h2>Background: Graphs and Spanning Trees</h2>
+
+<p>You used graphs in assignment 4.  This problem uses them again,
+so here is a review.
+</p>
+
+<p><span class="term">graph</span> is a collection of 
+<span class="term">vertices</span>
+connected by a collection of <span class="term">edges</span>.  
+An edge connects exactly
+two vertices to one another.  You can draw a picture
+of a graph by showing the vertices and the edges connecting them.
+Here is an example.  The vertices are shown as circles with 
+numbers in them and the edges are lines connecting the vertices.
+</p>
+
+<p></p><div align="center">
+  <img src="graph1.gif">
+</div><p></p>
+
+<p>We will only be concerned with <span class="term">connected</span> graphs.  
+A graph is connected if there is a <span class="term">path</span> 
+from every vertex to
+every other vertex, following edges.  For example, in the above
+graph, there is a path from 3 to 4 that goes (3, 1, 2, 4).  There are
+other paths from 3 to 4 as well.
+</p>
+
+<p>A <span class="term">weighted graph</span> is a graph in 
+which each edge has a number
+attached to it, called the weight of the edge.  Here is a picture
+of a weighted graph.
+</p>
+
+<p></p><div align="center">
+  <img src="graph2.gif">
+</div><p></p>
+
+<p>A <span class="term">spanning tree</span> of a graph is obtained by deleting
+as many edges as possible without making the graph so that it is
+no longer connected.  That is, we still need to have a path from
+each vertex to each other vertex.
+For example, the following is a spanning tree of 
+the above weighted graph.
+</p>
+
+<p></p><div align="center">
+  <img src="graph3.gif">
+</div><p></p>
+
+<p>The <span class="term">weight</span>
+of a spanning tree is the sum of the weights of
+its edges.  For example, the weight of the above spanning
+tree is 59.  Here is another spanning tree for the same graph.
+Its weight is 48.
+</p>
+
+<p></p><div align="center">
+  <img src="graph4.gif">
+</div><p></p>
+
+<p>Obviously, some spanning trees have smaller weight than
+others.  A <span class="term">minimal spanning tree</span> is a spanning tree
+with the smallest possible weight.
+</p>
+
+
+<hr>
+<a name="requirements"></a>
+<h2>Program Requirements</h2>
+
+<p>Write a program that reads
+a description of a weighted graph
+and prints the original graph and the edges that
+are part of a minimal spanning tree of that graph.  It should also print
+the total weight of the minimal spanning tree.  <b>The input should
+be read from the standard input, and the output should be
+written to the standard output.</b>
+</p>
+
+<a name="inputFormat"></a>
+<h3>Input format</h3>
+
+<p>The input starts with a line that tells how many vertices
+the graph has.  If there are five vertices, then those vertices
+have numbers 1, 2, 3, 4 and 5.  In general, if there are <i>n</i> 
+vertices, then they are numbered 1, ..., <i>n</i>.
+</p>
+
+<p>Following the first line are
+the edges, one per line.  Each edge line has three integers on it.
+Line
+</p><pre>2 4 50
+</pre>
+indicates that there is an edge between vertices 2 and 4,
+and that its weight is 50.  The end of the input is signaled
+by a line that contains just a 0.  An input describing graph 
+<p></p>
+
+<p></p><div align="center">
+  <img src="graph2.gif">
+</div><p></p>
+
+<p>might look like this.
+</p><pre>5
+1 2  9
+1 3 12
+2 4 18
+2 3  6
+2 5 20
+3 5 15
+0
+</pre>
+<p></p>
+
+<p>You can assume that there are no more than 100 edges, but that
+number must be easy to change.  To increase this to 200, for example,
+should only require changing one line of your program.
+</p>
+
+<a name="outputFormat"></a>
+<h3>Output format</h3>
+
+<p>The output of your program for this input might look like this.
+</p><pre>
+The input graph has 5 vertices, and its edges are as follows.
+
+  vertices    weight
+  1   2            9
+  1   3           12
+  2   4           18
+  2   3            6
+  2   5           20
+  3   5           15
+  
+A minimal spanning tree uses the following edges.
+
+  vertices    weight
+  2   3            6
+  1   2            9
+  3   5           15
+  2   4           18
+
+The total weight of the spanning tree is 48.
+</pre>
+<p></p>
+
+<h3>Tracing</h3>
+
+<p>If the command line contains <b>-te</b>, then trace the
+actions of the equivalence manager.  The combine function
+must show its parameters and show the entire boss
+array after the combine is done.  The together function
+must show its parameters and its result.
+</p>
+
+<p>If the command line contains <b>-tm</b>, then trace
+the actions of the algorithm that finds the minimal
+spanning tree.  Show the array of edges after sorting,
+including the two vertices and the weight.
+Then show each edge as it is being considered,
+and say whether it is added to the spanning tree or not.
+</p>
+
+
+<hr>
+<a name="algorithm"></a>
+<h2>Algorithmic Issues</h2>
+
+<p>For this problem, the algorithm is sufficiently difficult that
+it is a good idea to think about the algorithm before proceeding with
+the program design.
+</p>
+
+<a name="KruskalsAlgorithm"></a>
+<h3>Kruskal's algorithm</h3>
+
+<p>There is a well-known algorithm,
+called Kruskal's algorithm,
+for computing a minimal spanning tree of a weighted graph.
+It goes as follows.
+</p>
+
+<p></p><ol>
+  <li><p>Sort the edges from small weight to larger weight.
+  Call the sorted list of edges 
+  <i>e</i><sub>0</sub>, ..., <i>e</i><sub><i>m<tt>-</tt>1</i></sub>.
+  So, for example, <i>e</i><sub>0</sub> is the edge with the
+  smallest weight. (See <a href="#sorting">below</a> for an easy
+  way to sort an array of edges.)
+  </p><p></p></li>
+
+  <li><p>Start with an empty graph <i>K</i>.  It has all of the 
+  vertices, but no edges yet.  Edges will be added to it until, at
+  the end, it is the minimal spanning tree.
+  </p></li>
+
+  <li><p>For <i>i</i> = 0, ..., <i>m<tt>-</tt>1</i> do
+  </p><ol type="a">
+    <li>Look at edge <i>e</i><sub><i>i</i></sub>.  Suppose that it connects
+    vertices <i>u</i> and <i>v</i>.
+    </li>
+
+    <li>If there is not
+    already a path in <i>K</i> between vertices <i>u</i> and <i>v</i>,
+    then add edge <i>e</i><sub><i>i</i></sub> to <i>K</i>.
+    Otherwise, do not add it to <i>K</i>.  (How to determine whether
+    there is already a path is discussed 
+    <a href="#connect">below</a>.)
+    </li>
+  </ol>
+  <p></p></li>
+</ol><p></p>
+
+<p>When the algorithm is done, <i>K</i> is a minimal spanning tree
+for your graph.
+See <a href="#kruskal-justification">below</a> for an argument
+that Kruskal's algorithm works.
+</p>
+
+
+<a name="connect"></a>
+<h3>Determining connections</h3>
+
+<p>A tricky issue with Kruskal's algorithm is how to determine 
+whether two vertices are already connected by a path.  
+Suppose we write <i>u</i> ~ <i>v</i> is there is a path between
+<i>u</i> and <i>v</i>.  You might have seen the notion of
+an equivalence relation (in CSCI 2427).
+Notice that ~ is an equivalence relation.
+</p>
+<p></p><ol>
+  <li><p>(~ is reflexive) <i>u</i> ~ <i>u</i>.  That is, you can
+  always get from <i>u</i> to itself (by taking no edges).
+  </p></li>
+
+  <li><p>(~ is symmetric) If <i>u</i> ~ <i>v</i> then <i>v</i> ~ <i>u</i>.  
+  That is, if there is
+  a path from <i>u</i> to <i>v</i>, 
+  then there is also a path from <i>v</i> to <i>u</i>.
+  </p></li>
+
+  <li><p>(~ is transitive) If <i>u</i> ~ <i>v</i> and <i>v</i> ~ <i>w</i> 
+  then <i>u</i> ~ <i>w</i>.
+  If there is a path from <i>u</i> to <i>v</i> and 
+  also a path from <i>v</i> to <i>w</i>, then
+  there is a path from <i>u</i> to <i>w</i>.
+  </p></li>  
+</ol><p></p>
+
+<p>An equivalence relation is always characterized by its
+<span class="term">equivalence classes</span>.  
+That is, at any point in time, you can characterize which vertices
+are connected to which others by writing a collection of
+sets of connected vertices.  For example, suppose that there are 6 vertices.
+Sets
+</p><blockquote>
+  {1,3,4}, {2,5}, {6}
+</blockquote>
+indicate that vertices 1, 3 and 4 are connected to one another,
+vertices 2 and 5 are connected to one another,
+and vertex 6 is not connected to any other vertex.  Only vertices that
+are in the same set are connected to one another.
+<p></p>
+
+<p>Look at what Kruskal's algorithm needs to do with this collection
+of sets.
+</p>
+
+<p></p><ol>
+  <li><p>It needs to be able to ask whether two vertices are in the
+  same set.  That is, are they already connected by a path?
+  </p></li>
+
+  <li><p>It can add an edge, which causes two of the sets to be
+  combined.  For example, if it starts with
+  </p><blockquote>
+    {1,3,4}, {2,5}, {6}
+  </blockquote>
+  and adds an edge from 3 to 5, then sets {1,3,4} and {2,5} get
+  combined, yielding a new collection of sets
+  <blockquote>
+    {1,2,3,4,5}, {6}
+  </blockquote>
+  <p></p></li>
+</ol><p></p>
+
+<p>If we can figure out a way to handle a collection of disjoint sets, 
+with an operation to
+test whether two numbers are in the same set, and another operation
+that combines two of the sets in to one, then we will be able
+to implement Kruskal's algorithm.
+An algorithm that manages sets and that handles the operations required
+by Kruskal's algorithm is discussed
+<a href="#equiv">below</a>.
+</p>
+
+
+<hr>
+<a name="design"></a>
+<h2>Design Issues</h2>
+
+<p>Now, with the basics of the algorithms outlined, we can design
+the program.  This program should have three modules.
+</p>
+
+<p></p><ol>
+  <li><p><b>Module 1</b> 
+  implements the equivalence handling.  It should consist
+  of two files, equiv.h and equiv.cpp.  In equiv.h, define a structure
+  type Equiv, holding a pointer to an array of
+  integers and the size of that array.  See the 
+  <a href="#equiv">description of the equivalence manager algorithm</a> for the
+  intent of the array.  Write contracts and
+  prototypes for two functions, together(<i>e</i>, <i>x</i>, <i>y</i>) and
+  combine(<i>e</i>, <i>x</i>, <i>y</i>).  
+  The idea is that together(<i>e</i>, <i>x</i>, <i>y</i>) returns
+  true if <i>x</i> and <i>y</i> are in the same set,
+  as described by equivalence relation <i>e</i>;
+  and combine(<i>e</i>, <i>x</i>, <i>y</i>) 
+  modifies <i>e</i> so that the sets containing
+  <i>x</i> and <i>y</i> are combined into a single set.  The headings are
+  as follows.
+</p><pre>   bool together(Equiv&amp; e, int x, int y);
+   void combine(Equiv&amp; e, int x, int y);
+</pre>
+  File equiv.cpp contains implementations of those functions, plus
+  helper functions.  <b>Every function, including helper functions,
+  must have a clear contract that tells what it accomplishes and
+  how each of its arguments affects what it accomplishes.</b>
+  <p></p></li>
+
+  <li><p><a name="module2"></a><b>Module 2</b> implements Kruskal's algorithm.  
+  Keep it simple.  It has two files, graph.h and graph.cpp.
+  In file graph.h, create a structure type Graph, where a graph stores
+  </p>
+
+  <p></p><ul>
+    <li>A number of vertices</li>
+    <li>A number of edges</li>
+    <li>A pointer to an array of edges</li>
+  </ul><p></p>
+
+  <p>You will also want a structure type that represents one edge,
+  holding two vertex numbers and a weight.
+  Create the following functions, and add prototypes and contracts
+  for them to graph.h.  Put the implementations of these functions
+  into graph.cpp.
+  </p><ol type="a">
+    <li><p>A function that reads information about a graph, in the format
+    shown in the <a href="#requirements">requirements</a> section, 
+    and that returns a graph holding
+    the information that it read.
+    </p></li><p></p>
+
+    <li><p>A function to print a graph, by telling how many vertices it has,
+    how many edges it has, and then showing the edges.  It should not
+    print any specific heading.  For example, it should not say that
+    it is printing the input graph.  Just provide information about the
+    graph.
+    </p></li>
+
+    <li><p><a name="totalWeight"></a>
+    A function to compute the total weight of a graph, by adding up
+    the weights of the edges.  It should return the weight, and should
+    not write anything.
+    </p></li>
+
+    <li><p>A function that takes a graph <i>G</i> as a parameter
+    and returns another graph that is a minimal spanning tree of <i>G</i>.
+    This function contains an implementation of Kruskal's algorithm.
+    </p></li>
+  </ol>
+  Note that graph.cpp will need to include equiv.h, since it needs
+  the equivalence manager as a tool.
+  <p></p></li>
+
+  <li><p><b>Module 3</b> contains only a main program.  Call it main.cpp.
+  It should include
+  graph.h, but not equiv.h.  The main program should be short.  It
+  just does the following steps.
+  </p><ol>
+    <li>Read a graph.  This should be one line of code, 
+    since there is already a function that does this job.
+    </li>
+
+    <li>Print the graph (two lines of code, 
+    one for a heading saying that this is
+    the original graph, and another line to call the graph printer).
+    </li>
+
+    <li>Compute the minimal spanning tree of the graph (one line).
+    </li>
+
+    <li>Print the minimal spanning tree of the graph (two lines, since
+    you need to say what is being printed).
+    </li>
+
+    <li>Print the weight of the minimal spanning tree (one line).
+    </li>
+  </ol>
+  <p></p></li>
+</ol><p></p>
+
+
+<hr>
+<a name="implementation"></a>
+<h2>Implementation Issues</h2>
+
+<h3>Edges and vertices</h3>
+
+<p>Do not confuse edges with vertices.  Keep track
+of the number of vertices in a graph separately from
+the number of edges.
+</p>
+
+<p>The <i>vertices</i> are numbered 1, ..., <i>n</i>.
+You will need to have an array of <i>edges</i>.
+It is a good idea to start numbering the edges
+from 0, not from 1.  So put the first edge that
+you read at index 0 in the array.
+</p>
+
+
+<a name="sorting"></a>
+<h3>Sorting an array of edges</h3>
+
+<p>You will need to sort the array of edges according
+to the weights of the edges.  There is a function
+in the C standard library called qsort that will sort an
+array.  It implements a variant of the Quicksort algorithm.
+You should include header file &lt;cstdlib&gt; to use qsort.
+</p>
+
+<p>Qsort is a general sorting function,
+designed to be able to sort any type of array
+into any desired order.  In order to achieve that degree of 
+generality, qsort needs information about the array and how to sort it.
+It also needs for you to perform some conversions that, in general,
+would be questionable, but that work correctly here.
+</p>
+
+<p>Qsort takes four parameters.  In general, you write
+</p><pre>   qsort(base, numElements, elementSize, compare);
+</pre>
+where
+<ul>
+  <li><p>Parameter <b>base</b> is a pointer to the array that you want to sort.
+  You should convert this pointer to type (void*).
+  </p></li>
+
+  <li><p>Parameter <b>numElements</b> is the number of elements in the array.
+  </p></li>
+
+  <li><p>Parameter <b>elementSize</b> is the number of bytes occupied by 
+  each element.  If each thing in the array has type Edge, then
+  this should be <b>sizeof(Edge)</b>.
+  </p></li>
+
+  <li><p>Parameter <b>compare</b> is a function.  
+  (C++ allows you to pass a function
+  as a parameter to another function.  You do not run the function yourself;
+  qsort will run it for you.  You are just lending the tool to qsort, not
+  using the tool yourself.)
+  Function compare takes two parameters, which
+  will be <i>pointers</i> to particular members of the array when
+  qsort calls it.  compare(<i>A</i>, <i>B</i>) should return
+  </p><dl>
+     <dt>A negative number</dt>
+     <dd><p>if *<i>A</i> should come before *<i>B</i> in the sorted array
+     </p></dd>
+
+     <dt>A positive number</dt>
+     <dd><p>if *<i>A</i> should come after *<i>B</i> in the sorted array
+     </p></dd>
+
+     <dt>0</dt>
+     <dd><p>if you do not care what order they are in
+     </p></dd>
+</dl>
+<p></p>
+
+<p>Your comparison function might look like this, since you want
+to sort according to the weights of the edges.
+</p><pre class="ccode">  int compareEdges(const Edge* A, const Edge* B)
+  {
+    return A-&gt;weight - B-&gt;weight;
+  }
+</pre>
+</li></ul>
+<p></p>
+
+<p>To run qsort,
+define a new type, QSORT_COMPARE_TYPE, as follows.  It is the type
+of the compare parameter that qsort expects to receive.
+</p><pre class="ccode">   typedef int (*QSORT_COMPARE_TYPE)(const void*, const void*);
+</pre>
+Now statement
+<pre class="ccode">   qsort((void*) Arr, n, sizeof(Edge), (QSORT_COMPARE_TYPE) compareEdges);
+</pre>
+will sort array of edges Arr according to weights, with smaller weights
+toward the beginning of the array.
+<p></p>
+
+<h3>Warning</h3>
+
+<p>Your function, compareEdges, does <b><i>not</i></b> have type
+QSORT_COMPARE_TYPE, since compareEdges takes two parameters of
+type const Edge*, and qsort says that it should take two parameters of
+type void*.  But you can tell the compiler to ignore this, and
+to let you pass your compareEdges function to qsort, by doing a
+<i>cast</i>, which tells the compiler to treat a value of one type
+as if it is a value of a different type.  In most cases, this is a
+very dangerous thing to do, but you have to do it to use qsort.
+</p>
+
+
+<hr>
+<a name="equiv"></a>
+<h2>Handling Connections: An Abstract Data Type</h2>
+
+<p>Programs often need to use tools that are provided as
+<span class="term">abstract data types</span>.  
+An abstract data type is a type of data
+along with some operations.  An object that belongs to the data type
+remembers some information, and the operations either get or modify
+that information.  
+</p>
+
+<p>You need an abstract data type that manages equivalence classes of
+positive integers.  This section describes the abstract data type in 
+a little more detail, and tells you a simple way to implement it.
+</p>
+
+<h3>The conceptual view</h3>
+
+<p>The conceptual view is how somebody who <i>uses</i> the abstract
+data type thinks about it.  You create an Equiv object by telling
+it a positive integer <i>n</i>.  You write
+</p><pre class="ccode">  Equiv e(n);
+</pre>
+to create an object <i>e</i> that manages an equivalence relation
+(a collection of disjoint sets) over 1, ..., <i>n</i>.
+Initially, the sets are {1}, {2}, ..., {<i>n</i>}.
+<p></p>
+
+<p>Two functions are available.
+</p><dl>
+  <dt>together(<i>e</i>, <i>x</i>, <i>y</i>)</dt>
+  <dd><p>This returns true if <i>x</i> and <i>y</i> 
+  are currently in the same set
+  in object <i>e</i>, and false if they are in different sets.
+  </p></dd>
+
+  <dt>combine(<i>e</i>, <i>x</i>, <i>y</i>)</dt>
+  <dd><p>This makes <i>x</i> and <i>y</i> equivalent, 
+  combining the sets that contain them.
+  </p></dd>
+</dl>
+
+<p>The following shows an example that does a sequence of combine and
+together operations.  After each combine operation, the new
+collection of sets is shown.
+The result of a together operation
+is either true or false.  The example is for the case where <i>n</i> = 7.
+</p>
+
+<p></p><center><table border="2">
+  <tbody><tr>
+    <th>Operation</th>
+    <th>Result</th>
+  </tr>
+  <tr>
+    <td>&nbsp;</td>
+    <td align="center">{1} {2} {3} {4} {5} {6} {7}</td>
+  </tr>
+  <tr>
+    <td align="center">combine(<i>e</i>,3,6)</td>
+    <td align="center">{1} {2} {3,6} {4} {5} {7}</td>
+  </tr>
+  <tr>
+    <td align="center">combine(<i>e</i>,4,5)</td>
+    <td align="center">{1} {2} {3,6} {4,5} {7}</td>
+  </tr>
+  <tr>
+    <td align="center">together(<i>e</i>,3,6)</td>
+    <td align="center">true</td>
+  </tr>
+  <tr>
+    <td align="center">together(<i>e</i>,4,6)</td>
+    <td align="center">false</td>
+  </tr>
+  <tr>
+    <td align="center">combine(<i>e</i>,3,5)</td>
+    <td align="center">{1} {2} {3,4,5,6} {7}</td>
+  </tr>
+  <tr>
+    <td align="center">combine(<i>e</i>,3,1)</td>
+    <td align="center">{2} {1,3,4,5,6} {7}</td>
+  </tr>
+  <tr>
+    <td align="center">together(<i>e</i>,3,4)</td>
+    <td align="center">true</td>
+  </tr>
+  <tr>
+    <td align="center">together(<i>e</i>,1,6)</td>
+    <td align="center">true</td>
+  </tr>
+  <tr>
+    <td align="center">together(<i>e</i>,2,4)</td>
+    <td align="center">false</td>
+  </tr>
+  <tr>
+    <td align="center">combine(<i>e</i>,3,5)</td>
+    <td align="center">{2} {1,3,4,5,6} {7}</td>
+  </tr>
+</tbody></table>
+</center><p></p>
+
+<p>Notice that you are allowed to combine two numbers that are
+already in the same set.  Nothing happens then.
+</p>
+
+<font size="+1"></font><p><font size="+1"><b>Important note.</b> Your graph.cpp module uses the equivalence
+manager.  It must <i><b>only</b></i> use the operations described
+here, under the conceptual view of the equivalence manager.  It must
+not make use of any of the implementation details discussed under the
+algorithm.  For example, graph.cpp should make no mention of the concept
+of a boss or a leader.
+</font>
+</p>
+
+<h3>Algorithm</h3>
+
+<p>There is a simple way to implement the Equiv abstract data type.  
+The idea is to have a <span class="term">leader</span> of each set.
+For example, if numbers 3, 5 and 8 are in the same set,
+then they might decide that 5 is their leader.  You write a
+function leader(<i>e</i>, <i>k</i>) that returns the
+leader of the set that contains <i>k</i> in collection of sets <i>e</i>.
+Then, to find out whether two numbers are in the same set,
+just check whether they have the same leader.
+</p>
+
+<p>To implement the leader function, use another idea that
+is related to leaders.  Each number that is not a leader
+has a <span class="term">boss</span>.  The boss
+of a number might be that number's leader, or it might not.  But
+the boss is closer to the leader.  You find your leader by
+going to your boss, then to your boss's boss, etc, until you
+hit a number that does not have a boss.  To indicate that
+a leader does not have a boss,
+we will say that its boss is 0.
+So, if <i>e</i>.boss[<i>k</i>] is <i>k</i>'s boss 
+(in <i>e</i>),
+then you can find <i>e</i>'s leader using the following loop.
+</p><pre class="ccode">  r = k;
+  while(e.boss[r] != 0) r = e.boss[r];
+</pre>
+Now <i>r</i> is <i>k</i>'s leader.
+<p></p>
+
+<p>When you combine two sets, you start by getting the leaders of those
+sets.  Be careful; if the leaders are the same, do not make any changes.
+But if the leaders are different, then make one of those leaders be the
+boss of the other.  For example, if <i>x</i> and <i>y</i> are two 
+different leaders, then
+</p><pre class="ccode">  e.boss[x] = y;
+</pre>
+makes <i>y</i> be <i>x</i>'s new boss.  
+<p></p>
+<font size="+1">
+<p><b>It is critical that you only change the boss of a leader.  If <i>x</i> is
+not a leader, do not change <i>x</i>'s boss.</b>
+</p>
+
+<p>Remember that, if you are asked to combine two values that already have the same
+leader, do not make any change.
+</p>
+</font>
+
+<p></p>
+
+<hr>
+<a name="trace"></a>
+<h2>Tracing</h2>
+
+<p>Your program must contain switchable debug prints.
+At a minimum, it must show each edge as it is
+considered and whether or not the edge was added
+to the tree.
+</p>
+
+<hr>
+<a name="plan"></a>
+<h2>An Implementation Plan</h2>
+
+<p>Here is a suggestion for how to write this program.
+</p>
+
+<p></p><ol>
+  <li><p>
+  Write the type definitions, contracts and headings
+  in equiv.h.  Implement the functions in equiv.cpp, including
+  functions leader, together and combine.  They should be very
+  short and simple.  Add one more
+  function that prints the boss array, for tracing.
+  Add trace prints to the combine function so that it can show the boss
+  array before and after it runs.  Add trace prints to the
+  together function so that it can show its parameters and the
+  answer that it got.
+  </p>
+
+  <p>Write a <i>separate</i> main program that tests your implementation
+  of this module.  
+  Print the result of each together call.  Be sure to try cases where
+  you are combining things that are already together.  
+  <b><i>Test thoroughly.</i></b>
+  Do not throw away your tester, and do not move on until this module works.
+  </p>
+
+  <p>Read: <a href="#equiv">Handling connections: an abstract data type</a>.
+  </p></li>
+
+  <li><p><a name="intermediate"></a>
+  Once the above functions are working,
+  submit equiv.h, equiv.cpp and testequiv.cpp as assignment 7i.
+  </p></li>
+
+  <li><p>
+  Create types Edge and Graph in graph.h.  An Edge just remembers
+  the two vertices that it connects and its weight. 
+  A graph needs to remember
+  how many vertices it has, how many edges it has, and an array
+  of Edges.  Include a constructor
+  that builds an array of a fixed size.  You will want to tell the
+  constructor how many vertices there are, but make it set the
+  graph to have no edges initially.  The size of the array of
+  edges should be a 
+  named constant, such as maxEdges.  For example,
+</p><pre>   const int maxEdges = 100;
+</pre>
+  defines maxEdges to be 100.  <b>Do not forget to write const.</b>
+  Make the definition of maxEdges global so that it can be
+  shared by different functions.  Global constants are not
+  a problem.
+  <p></p>
+
+  <p>Add prototypes to graph.h
+  for the readGraph and printGraph functions.
+  </p>
+
+  <p>In graph.cpp, define a function that adds an edge to a graph.
+  Then implement the functions that read and print a graph.  
+  You should
+  be able to adapt your readGraph function from assignment 3.  But
+  do not use an adjacency list for this program.  Just put the edges
+  into the array of edges.  You should find readGraph and printGraph
+  to be simple functions.
+  </p>
+
+  <p>Now write part of the main function in main.cpp.  
+  Just have it read the graph and print it.  <b<test this="" part.<="" b="">
+  Do not move on until it works.
+  </b<test></p>
+
+  <p>Read: <a href="#inputFormat">Input format</a>,
+  <a href="#outputFormat">Output format</a> and
+  <a href="#module2">Synopsis of module 2</a>.
+  </p></li>
+
+  <li><p>
+  Implement the function that computes the total weight of a graph.
+  Add a line to your main program that computes and prints the total weight of the
+  input graph.  Test it.
+  </p>
+
+  <p>Read: <a href="#totalWeight">Function to compute the total weight
+  of the graph</a>.
+  </p></li>
+
+  <li><p>
+  Implement the function that computes the minimal spanning tree,
+  using <a href="#algorithm">Kruskal's algorithm</a>.  It needs to
+  take a graph as a parameter and yield another graph, which will
+  hold the minimal spanning tree.
+  </p>
+
+  <p>Add debug prints that allow you to print the list of edges.
+  Show the list before and after you sort it, to ensure that you
+  are using qsort correctly.
+  </p>
+
+  <p>Since you already have the equivalence manager, Kruskal's
+  algorithm is very short and simple.  Make sure not to make it
+  too complicated.
+  </p>
+
+  <p>Modify your main program to use Kruskal's algorithm, 
+  and to do the entire job, according
+  to the requirements.  Test it on several different graphs.  Do not try
+  just one graph.  <b><i>Be warned that most students under-test their
+  programs, and turn in programs that contain errors.</i></b>
+  </p>
+
+  <p>Read: <a href="#KruskalsAlgorithm">Kruskal's algorithm</a>,
+  <a href="#sorting">Sorting the array of edges</a>
+  </p></li>
+
+  <li><p>
+  </p><p>Now that you have a working version,
+  <b><i>save it</i></b> and <b><i>keep it</i></b>.  For example,
+  create a subdirectory to hold the basic, working version.  In Linux,
+  command
+</p><pre>  cp -R <i>olddir newdir</i>
+</pre>
+   will make a copy of directory olddir, calling the copy newdir.  For example,
+<pre>  cp -R mst mst1
+</pre>
+  makes a copy of directory mst and all of its contents, and calls
+  the copy mst1.
+  <p></p></li>
+
+  <li><p>If you have time, implement the 
+  <a href="#extra">extra credit parts</a>.  
+  Test them carefully.  Do not make the mistake of just writing something
+  and then doing shoddy testing.  Actually look at the results of your
+  tests.  Notice that you are modifying equiv.cpp.  Instead of just
+  running your application, try running your tester that was designed
+  for testing equiv.cpp.  You will get better testing that way.
+  <b><i>Be warned that most students implement the improvements incorrectly
+  because they do not take time to think carefully about what they
+  are doing.</i></b>
+  </p></li>
+
+  <li><p>Submit your work.
+  </p></li>
+</ol><p></p>
+
+
+<hr>
+<a name="submit"></a>
+<h2>Submitting Your Work</h2>
+
+<p>To submit version 7i, change to the directory that contains
+your files and run command
+</p><pre>~abrahamsonk/3300/bin/submit 7i equiv.cpp equiv.h testequiv.cpp</pre>
+<p></p>
+
+<p>To submit the final version, change to the directory that contains
+your files and run command
+</p><pre>~abrahamsonk/3300/bin/submit 7 equiv.cpp equiv.h graph.cpp graph.h main.cpp</pre>
+<p></p>
+
+
+<hr>
+<a name="extra"></a>
+<h2>Extra Credit</h2>
+
+<p>For extra credit (up to 15 points), 
+implement two improvements on the algorithm
+for managing equivalence classes.  But do so carefully.
+</p>
+<ul>
+  <li><p>You will only receive extra credit for an improvement that
+  is implemented correctly.
+  </p></li>
+
+  <li><p>You will only receive extra credit for the improvement
+  if the program works correctly.  So do not do the improvement
+  before the graph module is working.
+  </p></li>
+
+  <li><p>If your "improvement" actually breaks the implementation,
+  so that it gives incorrect results, you will receive less credit for
+  the "improved" version than you would for a correct version
+  without any improvements.
+  </p></li>
+</ul>
+<p>The improvements make the equivalence manager more efficient when
+it is working on very large collections of sets.
+</p>
+
+<p>For simplicity, instead of <i>e</i>.boss, I will just write boss in this
+section.  Assume we are talking about a particular <i>e</i>.
+</p>
+
+<h3>The first improvement: improving leader</h3>
+
+<p>The first improvement involves a change to the leader
+function.  After the
+leader function scans through a chain of boss links to find the
+leader of a number, it should go back through the chain and
+put the genuine leader in the boss array for every
+number that was looked at in the chain.  That way, subsequent
+leader computations will go much more quickly.  
+For example, if the boss array contains
+</p><pre>  boss[1] = 2
+  boss[2] = 4
+  boss[3] = 0
+  boss[4] = 6
+  boss[5] = 3
+  boss[6] = 0
+  boss[7] = 4
+  boss[8] = 5
+</pre>
+then computing the leader of 1 requires chaining
+through 1, 2, 4, 6, stopping at leader 6.  
+The improvement changes the contents
+of the boss array to the following, by installing the
+correct leader (6) of each of the numbers that was looked at.
+<pre>  boss[1] = 6
+  boss[2] = 6
+  boss[3] = 0
+  boss[4] = 6
+  boss[5] = 3
+  boss[6] = 0
+  boss[7] = 4
+  boss[8] = 5
+</pre>
+You can do this with another loop that 
+rescans through the chain, the same 
+way the chain was scanned the first time, but now putting the leader
+into the array as you go.  Alternatively, modify the
+leader function to be recursive, then just change the boss
+after each recursive call.  (In the past, most students who
+did this improvement using a loop got it wrong, so be
+careful.  Most students who did it with recursion got it
+right.)
+<p></p>
+
+<p><b>Notice that we have not scanned the entire boss array from 
+beginning to end!</b>
+Boss[8] is still 5, even though the leader of 8 is 3.
+Only the numbers that were looked at in the original scan have their
+boss values changed.  If you try to change everything in the
+array, you make the implementation <b><i>slower</i></b>, not faster.
+</p>
+
+<p>Also notice that it was not just the boss of
+1 that was changed.  All of the numbers that were examined in
+the chain have their bosses set to their
+leaders.  For example boss[2] was changed too.
+</p>
+
+<p>Be sure to test your improved leader function.  It is easy to write
+it incorrectly.  Try it by hand to see whether it seems to do
+the right thing.
+</p>
+
+<h3>The second improvement: improving combine</h3>
+
+<p>Each number that is a leader has a collection of 
+<span class="term">constituents</span> 
+who have that number as their leader.    For example,
+in the above array, number 3 is a leader, and the
+constituents of 3 are 3, 5 and 8.  So number 3 has three
+constituents, counting itself.  The constituent count of a leader tells
+how many numbers are in the set that contains that leader.
+</p>
+
+<p>When doing a combine operation, 
+you find two values <i>s</i> and <i>t</i> that
+are leaders.  You can then either change the boss
+of <i>s</i> to <i>t</i> (so <i>s</i> is no longer a leader) or change the 
+boss of <i>t</i> to <i>s</i> (so <i>t</i> is no longer a leader).  Either
+one will accomplish the goal of combining the two sets, but the
+choice of which to do influences the efficiency of the implementation.
+The best choice is to change the boss of the number
+that has the fewest constituents.  That tends to keep the lengths of the
+boss chains up to the leader short.
+</p>
+
+<p>Modify the data structure so that each number has not only a
+boss, but also a count of its constituents.  A
+number that is not a leader has no constituents.  So now the
+information is an array of structures, where each structure contains
+a boss and a constituent count.
+</p>
+
+<p>A picture of the initial array, before any combines have
+been done, might look like this.  Notice that each number has
+one constituent, itself.
+</p><pre>  index    boss  numConstituents
+    1        0           1
+    2        0           1
+    3        0           1
+    4        0           1
+    5        0           1
+    6        0           1
+    7        0           1
+</pre>
+<p></p>
+
+<p>When doing a combine, compare the constituent counts of the two leaders.  
+Change the boss of the leader with the fewer constituents.  (If
+they have the same number of constituents, then the choice is
+arbitrary.)  If you
+change things so that the boss of <i>s</i> becomes <i>t</i>, then remember
+that <i>all</i> of the constituents of <i>s</i> become new constituents of 
+<i>t</i>.
+</p>
+
+<p>If you do combine(e,3,5) in the above array, you might
+arbitrarily decide to make the boss of 3 be 5.  Then the
+array looks like this.
+</p><pre>  index   boss  numConstituents
+    1        0           1
+    2        0           1
+    3        5           0
+    4        0           1
+    5        0           2
+    6        0           1
+    7        0           1
+</pre>
+If you now do combine(e,5,1), you must change the boss of 1,
+since it has fewer constituents than 5.  The array ends up looking like
+this.
+<pre>  index   boss  numConstituents
+    1        5           0
+    2        0           1
+    3        5           0
+    4        0           1
+    5        0           3
+    6        0           1
+    7        0           1
+</pre>
+As before, only change the boss of a number that
+is currently a leader.  If you now do combine(e,2,1), you
+must realize that you are really being asked to combine 2 and 5, since
+5 is the leader of 1.  Since 5 has more constituents, you change
+2's boss, yielding
+<pre>  index   boss  numConstituents
+    1        5           0
+    2        5           0
+    3        5           0
+    4        0           1
+    5        0           4
+    6        0           1
+    7        0           1
+</pre>
+As you can see, this improvement tends to lead to shorter chains
+of bosses before the leader is found.
+<p></p>
+
+<p>Suppose you continue by combining 6 and 7.  You might get the following.
+</p><pre>  index   boss  numConstituents
+    1        5           0
+    2        5           0
+    3        5           0
+    4        0           1
+    5        0           4
+    6        7           0
+    7        0           2
+</pre>
+Now combine 1 and 6.  Their leaders are 5 and 7.  Since 5 has more 
+constituents, change the boss of 7 to be 5.  The new information
+is as follows.
+<pre>  index   boss  numConstituents
+    1        5           0
+    2        5           0
+    3        5           0
+    4        0           1
+    5        0           6
+    6        7           0
+    7        5           0
+</pre>
+Notice that 5 now has six constituents.  Also notice that, although
+6 is one of 5's constituents, its boss is 7.
+The boss chains are shorter, but you still need to do the
+leader calculation using a loop (or recursion).
+<p></p>
+
+<h3>Efficiency before and after improvements</h3>
+
+<p>If you do neither improvement, then the equivalence manager can
+take time proportional to <i>n</i><sup>2</sup> to process <i>n</i>
+combine and together requests.  With the improvements, the time
+is no worse than proportional to <i>n</i>(Î±(<i>n</i>)) 
+where Î±(<i>n</i>), the 
+<span class="term">inverse of Ackerman's function</span>,
+is a very slowly growing function of <i>n</i>, so slow that, for all
+remotely practical values of <i>n</i>, Î±(<i>n</i> is no more than 6.
+</p>
+
+
+<hr>
+<a name="kruskal-justification"></a>
+<h2>Why Should I Believe that Kruskal's Algorithm Works?</h2>
+
+<p>Algorithm design requires creativity, and often requires simply
+feeling around until you hit on something that looks like it might
+work.  But be careful not to stop after you have something that feels
+reasonable.  A lot of algorithms that initially look like they will
+work are incorrect.  You don't want to jump into writing
+a program that implements the algorithm when the algorithm is wrong.
+That is a waste of time.  It is important to offer some
+careful reasoning about why the algorithm works before you try to
+implement it.
+</p>
+
+<p>Kruskal's algorithm adds the edges starting with the cheapest
+ones, and, since it is supposed to find a cheapest possible spanning
+tree, it seems to be doing something right.  But that is not justification
+that the algorithm works.  It is only justification for investigating
+it to see whether it works.
+</p>
+
+<p>This section offers an argument that Kruskal's algorithm is
+correct.  It should be clear that Kruskal's algorithm finds <i>a</i>
+spanning tree, if one exists,
+since it only skips over edges between vertices that
+are already connected by a path.
+The issue is whether that spanning tree is <i>minimal</i>.
+The argument is necessarily of a mathematical nature, as are most
+such arguments.  It will probably take more than one reading for a
+person who is inexperienced with this kind of argument to make
+sense of it.  But it is worth getting used to the idea of checking
+your algorithms carefully.
+</p>
+
+<p>We will simplify the argument by assuming that no two edges of a graph
+can have the same weight.  
+That assumption is fairly easy to get rid of, and the
+argument is essentially the same, but the assumption reduces the
+complexity of the argument a bit.
+</p>
+
+<h3>The argument</h3>
+
+<p>Before trying to show that an algorithm works, you typically try looking
+for some counterexamples.  Try to find an input that the algorithm
+gets wrong.  Suppose that you try that for a while with Kruskal's algorithm,
+and are not able to find any counterexamples.  Then imagine somebody
+else searching for counterexamples.  What if that other person finds one?
+Think about that (unknown, or generic) counterexample, and try to convince yourself
+that it cannot really be a counterexample; that is, no counterexample
+exists.
+</p>
+
+<p><b>CLAIM.</b> Kruskal's algorithm finds a minimal spanning tree
+of a graph.
+</p>
+
+<p>The argument is a kind of thought experiment.
+Suppose that somebody else claims to have found a counterexample
+demonstrating that Kruskal's algorithm does not work.
+We ask that person to give us the weighted graph <i>G</i> that the
+algorithm gets wrong, and
+the actual minimal spanning tree <i>T</i> for that graph.
+Obviously, if Kruskal's algorithm fails to work, then somebody
+should be able to come up with both <i>G</i> and <i>T</i>, where
+<i>T</i> is the correct minimal spanning tree, and where Kruskal's
+algorithm gets the wrong answer.
+<!--(If <i>T</i> is not the actual minimal spanning tree, then this
+person is lying, and this is not considered a counterexample.)-->
+</p>
+
+<p>Compute the spanning tree <i>K</i> produced by Kruskal's
+algorithm.  It must be different from <i>T</i> or this is
+certainly not a counterexample.
+</p>
+
+<p>If <i>G</i> has <i>n</i> vertices, then every spanning tree of
+<i>G</i> has exactly <i>n</i><tt>-</tt>1 edges.  (Try arguing that.)
+Since <i>K</i> and <i>T</i> do not have exactly the same edges, there
+must be some edge that is in <i>T</i> but not in <i>K</i>.
+</p>
+
+<p>Look at the edges of <i>G</i> in the same order
+<i>e</i><sub>0</sub>, <i>e</i><sub>2</sub>, ..., <i>e</i><sub><i>m<tt>-</tt>1</i></sub> 
+that they are looked at by Kruskal's algorithm
+(in ascending order of weight),
+and select the first one <i>e</i><sub><i>i</i></sub> 
+that is in <i>T</i> but not in <i>K</i>.
+Suppose that edge <i>e</i><sub><i>i</i></sub> connects 
+vertices <i>u</i> and <i>v</i>.
+Why wasn't 
+<i>e</i><sub><i>i</i></sub> added to tree <i>K</i>?  Because
+vertices <i>u</i> and <i>v</i> were already connected by
+a path through edges that Kruskal's algorithm had looked at earlier.  Look
+at that path, and look at how the same vertices are connected in <i>T</i>.
+</p>
+
+<p></p><div align="center">
+  <img src="Kruskal.gif">
+</div><p></p>
+
+<p>At least one of the edges <i>e</i><sub><i>j</i></sub> in 
+this path between <i>u</i> and 
+<i>v</i> must not be in tree <i>T</i>.  
+(Otherwise, <i>T</i> would have a cycle, and a tree cannot
+have any cycles.)
+Also, <i>j</i> &lt; <i>i</i>,
+since the edges shown for <i>K</i> were added before
+edge <i>e</i><sub><i>i</i></sub> was considered.
+Since the edges are looked at in ascending order of weight,
+<i>e</i><sub><i>j</i></sub> must have a smaller weight than edge
+<i>e</i><sub><i>i</i></sub>.
+</p>
+
+<p>Make a modified tree
+<i>T'</i> by removing edge <i>e</i><sub><i>i</i></sub> from <i>T</i>
+and adding edge <i>e</i><sub><i>j</i></sub>.  All of the vertices are still
+connected.  (You can still get from any vertex shown in the picture to
+any other, so you have not cut anything off from anything else.)
+So <i>T'</i> is another spanning tree.  But <i>T'</i> has smaller
+total weight than <i>T</i>, since we replaced a heavier edge by a lighter one.
+Obviously, <i>T</i> is not a minimal spanning tree, because <i>T'</i> is
+a spanning tree with smaller total weight.
+</p>
+
+<p>That completes the argument.  No matter what purported counterexample
+somebody gives us, we have shown that it cannot be a genuine counterexample.
+So no counterexample exists, and Kruskal's algorithm is correct for every
+graph.
+</p>
+
+<hr>
+<a name="motivation"></a>
+<h2>Motivation for Computing Minimal Spanning Trees<br>
+(you can skip this)
+</h2>
+
+<p>Suppose that we have a collection of towns, and we must
+build railroad tracks so that it is possible for a train to
+get from any town to any other town.  Our budget for
+building tracks is small, so we choose to build as little
+track as possible.  One approach to deciding which tracks to
+build is to construct a weighted graph, where the vertices are the
+towns, and the weight of
+the edge from town <i>A</i> to town <i>B</i> is the 
+length of the railroad track
+that would need to be built to connect towns <i>A</i> and <i>B</i> directly.
+Then a minimal spanning tree of that graph would be a good 
+choice for connecting the towns, since it is the cheapest
+way to connect all of the towns using railroad tracks
+between towns.
+</p>
+
+<p>A similar problem occurs when a house is being wired for
+electricity.  All of the outlets on a given circuit need to
+be connected to the circuit panel, and to each other.  
+To connect them with a minimum
+amount of wire, you might build a graph having a vertex for each
+outlet and for the circuit panel, with the weight between two vertices
+being the  wiring distance between those vertices.  
+Then get a minimal spanning tree for the graph.
+</p>
+
+<p> (A minimal spanning tree is not always the best solution to either
+of those problems.  You
+can often do better by introducing new railroad track junctions or
+wiring junctions, called <span class="term">Steiner points</span>.  For example, if you
+have three towns in a triangle, you can connect them together
+by sending tracks to a point in the middle of the triangle.
+The middle point is a Steiner point.
+But good placements of
+Steiner points can be difficult to find, so a minimal spanning tree is
+a reasonable compromise.)
+</p>
+
+<p>There are other uses of minimal spanning trees.  For example,
+they are used as part of an algorithm that finds good (but not
+optimal) <span class="term">traveling salesman tours</span> of graphs.
+</p>
+
+<p>&nbsp;</p>
+<p>&nbsp;</p>
+<p>&nbsp;</p>
+
+
+</body></html>Ytext/htmlUUTF-8_Hhttp://www.cs.ecu.edu/karl/3300/spr15/assignments/Assignment7/assn7.htmlP¦"&Ô_WebResourceResponseOõbplist00ÔbcX$versionX$objectsY$archiverT$top † ¯#)*0123IJKLMNOPQRSTUVWXY]U$nullİ	
+ !"R$6S$10R$2R$7R$3S$11R$8V$classR$4R$9R$0R$5R$1€	€€€ €€€€Ó$%'(WNS.base[NS.relative€ €€_.http://www.cs.ecu.edu/karl/3300/spr15/3300.cssÒ+,-.Z$classnameX$classesUNSURL¢-/XNSObject#A¾ë	²Ø, ÈÓ456?HWNS.keysZNS.objects¨789:;<=>€	€
+€€€€€€¨@BCDEFG€€€€€€€€€VServer\Content-TypeTEtag]Last-ModifiedTDate]Accept-Ranges^Content-LengthZConnection_Apache/2.2.3 (Red Hat)Xtext/css_"64001-3c8-e9230000"_Fri, 09 Jan 2015 01:16:48 GMT_Sun, 26 May 2030 22:37:28 GMTUbytesS968UcloseÒ+,Z[_NSMutableDictionary£Z\/\NSDictionaryÒ+,^__NSHTTPURLResponse£`a/_NSHTTPURLResponse]NSURLResponse_NSKeyedArchiverÑde_WebResourceResponse€    # - 2 7 U [ v y } € ƒ † Š  ” — š    £ ¥ § © « ­ ® ° ² ´ ¶ ¸ º ¼ Ã Ë × Ù Û İ'-09BDFMU`ikmoqsuwy‚„†ˆŠŒ’”›¨­»ÀÎİè
+!AagkqvŒ¢¶ºÎÜîñ             f              	OÈh1	{color: black; 
+         text-align: center
+        }
+h2	{color: #0000D0; 
+         text-align: center
+        }
+h3	{color: #0000D0; 
+         text-align: left
+        }
+body	{background-color: white; 
+         color: black; 
+         margin: 15px
+        }
+sub	{font-size: 80%}
+sup	{font-size: 80%}
+dt	{color: #D00000; 
+         font-weight: bold
+        }
+.ccode	{color: #903000; 
+         font-weight: bold
+        }
+.bcode	{color: #FF0000}
+.tab	{background-color: #A0A0FF}
+.term	{color: blue; 
+         font-style: italic
+        }
+.small  {
+         font-size: smaller
+        }
+.write  {color: #D00000}
+
+.red {
+        color: red
+}
+.darkred {
+        color: #D00000
+}
+.th	  {
+  background-color: #C090E8;
+  text-align: center
+}
+A:link    {
+  color: blue;   
+  text-decoration: none
+}
+A:visited {
+  color: #9900FF;   
+  text-decoration: none
+}
+A:active  {
+  color: red;    
+  text-decoration: underline
+}
+A:hover {
+  color: red;
+  text-decoration: underline
+}
+Xtext/css_.http://www.cs.ecu.edu/karl/3300/spr15/3300.cssÔObplist00ÔbcX$versionX$objectsY$archiverT$top † ¯#)*0123IJKLMNOPQRSTUVWXY]U$nullİ	
+ !"R$6S$10R$2R$7R$3S$11R$8V$classR$4R$9R$0R$5R$1€	€€€ €€€€Ó$%'(WNS.base[NS.relative€ €€_Hhttp://www.cs.ecu.edu/karl/3300/spr15/assignments/Assignment7/graph1.gifÒ+,-.Z$classnameX$classesUNSURL¢-/XNSObject#A¾ë	²Ø‘\ ÈÓ456?HWNS.keysZNS.objects¨789:;<=>€	€
+€€€€€€¨@BCDEFG€€€€€€€€€VServer\Content-TypeTEtag]Last-ModifiedTDate]Accept-Ranges^Content-LengthZConnection_Apache/2.2.3 (Red Hat)Yimage/gif_"645da-4ba-413f2880"_Tue, 23 Dec 2014 17:10:42 GMT_Mon, 27 May 2030 09:46:17 GMTUbytesT1210UcloseÒ+,Z[_NSMutableDictionary£Z\/\NSDictionaryÒ+,^__NSHTTPURLResponse£`a/_NSHTTPURLResponse]NSURLResponse_NSKeyedArchiverÑde_WebResourceResponse€    # - 2 7 U [ v y } € ƒ † Š  ” — š    £ ¥ § © « ­ ® ° ² ´ ¶ ¸ º ¼ Ã Ë × Ù Û İ(-8AGJS\^`gozƒ…‡‰‹‘“œ ¢¤¦¨ª¬®µÂÇÕÚè÷%<\|‚‡’¨¬¹¾ÒÖêø
+#             f              %OºGIF87aSÆ €     ÿÿÿ!ù     ,    SÆ @ÿŒ©Ëí£œ´Ú‹³Ş¼û†âH–æ‰¦êÊ¶îÇ`Ñò ö¤ã~¸[CYA;*”?ó|æš>õŠÍB¤ÒwK=uµ³°™Ò‹¤ÏHk{Íöà^7Ïîzÿò×'8(D¸(‚h¸x¦ØçÈÉ8ù"ùcyI©i†¹)Ñù)Šê4ÚQzªZ“ºÊàú*+{Ck;‹›»×û•ÁŒ2LC¶tüii¼\Vı,ø%ıàL=…í¦¦ıhú-(ÎÜı–]®¾ÎŞîş/?O_oŸ¯¿Ï/~ÕĞ¶8Í´…JGL‰'ÁÜ’%¢Ä‰+Z¼x”·€'×ÈQÔğ#*êBæIe’¤HƒTKÙæ4—¯d°)Œæ)œ9kêÙ¤ÄÓ!ËŸºªØJtf
+¤š˜&SÂi.©.>%uµ%¬7ÿ9Ç5ÚÖmaG*}˜4Ğªæ0RDË‡í,rã,ËÍ+Ş½|ûúı8°àÁ„>Œ8±âÅŒ;~y)Ø¢hßé3ùª"¹ ı"Ê$ÉYd•Å[›Y™Ê#QJ·:Úg…1€ÜÚ–¨Çšé[®U'Ô¸‘æfN~¨¡Ìzù2Á¸uÇÍ&¹‘İÊ‘DgÓ\«ÀëM²‹YÊİè3˜Ş—7‹ãü`õ‰‡×>·Ú{ğÌ€Î7ÁŞwüûá(ÛÊ£ÿÔy r0 NœØXe"‚ ñä |
+Âæ\?ŞÓĞ…İMØ[‚rÈ
+~ièÎq„‘XÒgŠ¡ø#,şÇß/öb(3•77NE ^¡¥fd=§ÙX±¦Vp?é]¨Ü%Fª¸²cz2ÖI•ªÈÜˆbIf™f‰fšj®Éf›n¾	gœrÎIgvŞ‰gzîÉgŸ~ş	h ğ‚–ØU]‰†å%,Ù5*„–³¡ÆhÒµ7¦ÂQwd%Å‡^UÑÉà§/mG’B…È[´Z“±–«¤uH¬FîÖH”¾.èd°Vâä/ˆ %<wÛéª0îÚl>m)lµÆ*I,?Ã…±ìoWŠšm«–fj*£†^ŠF9˜Hº$…êË.W‹ªûÉênŠ=âk-½¨ò[¬¿‰ œ«À$ÄšgôŒpÁâÛpòÛpPÏzµJÊÖÅÚ>‹İÆ²áøç‹ùyŒá(¢L†²Ü`S*ï¹ò*0[¶ˆ–7³srÆvªñÎÏ‡*ê+gÇ%Î)•Ğú¹É”Ó¼®i1>R_{«´P¿fa›)]­é™!]®™‘½¯ØÅ ‡¦1h‹höÁ}½=	-tãG&•ëYÊİÇ˜öa~çV¶yNëØàÙµ®˜nx:Œ$p×µfù^;`Qïæ’^Öä‘~îê¹M¹ÄÉ.G¡lëbÍ{»™O-xêÑ>ÑZ‰ÇŠí¦ĞâÎˆ¯ÆODW^¾8²Ç+vá~›XßòR_=èÌkÿ{ôl÷4_˜‰¾ôp*^}f´Ì~ûî¿üòÏOıößşúïÏÿşÿÀ 
+p€,àœ
+  ;Yimage/gif_Hhttp://www.cs.ecu.edu/karl/3300/spr15/assignments/Assignment7/graph1.gifÔObplist00ÔbcX$versionX$objectsY$archiverT$top † ¯#)*0123IJKLMNOPQRSTUVWXY]U$nullİ	
+ !"R$6S$10R$2R$7R$3S$11R$8V$classR$4R$9R$0R$5R$1€	€€€ €€€€Ó$%'(WNS.base[NS.relative€ €€_Hhttp://www.cs.ecu.edu/karl/3300/spr15/assignments/Assignment7/graph2.gifÒ+,-.Z$classnameX$classesUNSURL¢-/XNSObject#A¾ë	²Ø® ÈÓ456?HWNS.keysZNS.objects¨789:;<=>€	€
+€€€€€€¨@BCDEFG€€€€€€€€€VServer\Content-TypeTEtag]Last-ModifiedTDate]Accept-Ranges^Content-LengthZConnection_Apache/2.2.3 (Red Hat)Yimage/gif_"645db-586-413f2880"_Tue, 23 Dec 2014 17:10:42 GMT_Mon, 27 May 2030 09:46:17 GMTUbytesT1414UcloseÒ+,Z[_NSMutableDictionary£Z\/\NSDictionaryÒ+,^__NSHTTPURLResponse£`a/_NSHTTPURLResponse]NSURLResponse_NSKeyedArchiverÑde_WebResourceResponse€    # - 2 7 U [ v y } € ƒ † Š  ” — š    £ ¥ § © « ­ ® ° ² ´ ¶ ¸ º ¼ Ã Ë × Ù Û İ(-8AGJS\^`gozƒ…‡‰‹‘“œ ¢¤¦¨ª¬®µÂÇÕÚè÷%<\|‚‡’¨¬¹¾ÒÖêø
+#             f              %O†GIF87ac× €     ÿÿÿ!ù     ,    c× @ÿŒ©Ëí£œ´Ú‹³Ş¼û†âH–æ‰¦êÊ¶îÇòLˆMçŸ}ğÓ	uÁEõ;Î Ì`S9t6‡h•J±!Z¬¦œ>À^á19.;´]²:+!»ß¹¹—Ûñ–ıÖÏ(¸8Qxe¨¸è¸èˆÉ8I'Yf)‚I¹¹Ä¹Å¨é)z˜XJˆv€:JÙÊÁäz;k×yR«Û{§R¸ê›6\L8Âk§ÌÌuÜ\	-ıK:­(«gıõD¬mZı-Ãv#şõ”®¾ÎŞîîª™<>)?¿3'{¿ìÄÿ†0{<ˆ0¡Â…:|1¢Ä‰+Z¼ˆ\˜Œ+æXu¼&f–*kãö‰ÉÎZÛÓ†–»™4Õá)N¢•uXrô2ŒÓ¾b<o®é¦ògÀ¢fR0Ušê$¨Ò–°Ú‡*ÑIX3Å¢–Rk$#çÔtuqVl‡´`ù±U[©·¹àj¬¡•®]ö&õ[wà¸ƒ¯¶½¢a½ÂdqycœsMÙÁñ ;şbù±äÌœí
+Û9´èÑ¤K›>:µêÕ¬[»~;¶ìÙ´kÛ†— éíŸ3~N¬8¨@¨¿uºäsÜĞ<J­ …š$àş:¿&u¯qî«¹îxcãšU‚?>½úv—7OÜYİ}d]mÒ•ŸmÓÈªkwİG	ª›r@ÂƒF}ç“XlŒa
+F1ÍJÎ6!XUø†Ñ5õ o·L¨!j!ŠÇÇˆ£™¨ Š)f°Jo¢-çbnñ‰´aŒ¡)Ó)R	Æ×a/ÊØ*ö×¡…Q!X$‘-•ä†hÑóQ3C×‚CM©d““!óŒüiy__jaùŞ.Œ‘ùĞt7‚%a§¡™Ğ\®Ù—›psÒ¹bkğ•&'ho†ùWfÏyÙ#Ÿİm¹W>ˆâ·ÊaY}ËÉw¢‘œYçKNşHm5éŸ²Iê„–šá|¨®Êj«®È¾
+k¬²ÎJk­¶ŞŠk®ºîÊk¯¾ş
+l°ÂKl±Æ‹l²Ê.ËlUv^c›ÂÚXQqÆRK‘¡;E¦G‚5b€£Š"î³HHûŸ¹—D‰á¶FdênŠ<KvŞ.˜Õ+c‘Ä"GÎ]7c§Òe™­u”êØåG„c¡ã‘g‰½äxªŸi¾ëh«Šî‡nrLD£ëíË1Šì1UŒìÖ¦%J¬±/Š.ÚĞ~Ø¡¤Â8?\ğÇç«L(÷ö¨!6K¹psêêô—ıÎ6[±ÅÎ5´iôj£mÖC5Ò_qÍ3Ö–‚½53°TÍ)¿& İÛ0s¶Û ÃµÜ1WÉµİ{Ø¬Şoéí™Ìø.Ë6ƒ€çeK»ÉŞ.²ğBW,šdîàÒµaù¸À¿`+hñîğ(‹…uø êİÆ4’Ìy¤ 7®©Ï¤‹èÜSMW·}·íKêÜd÷¡Ø¼&VzÑ²Ò•<Í±²Õ<”¹}Ó´^˜ûç‚ÛúÔÌ]§|ı“„Yû¬’,µÙæ7øô÷ÛÃ*ÏtäãÍÿÚbUÏÙ‰ºŠ
+ş1ø¯61€NKØ™V5º5‘jO¤! ğ¤÷'0%g5YÓk¼wAíÈRz*[ÎÈŠOéÆ¡kß‰òAÂ—­Ìr)$Ó—¶Ú½Í/ƒ‚¡;·BŞpL/”ag:rA‡-,)4ú®D"k¢M’vƒùQ|G$§Eô0AV ë¸ØE~ñkÔ¢ÍxÁ Y…şyblFµ;²=Ïs:”cœ@ƒE;&lxzdØûhkR"Z¤!‰ÈD*r‘Œl¤#	ÉHJr’”¬¤%/‰ÉL.«  ;_Hhttp://www.cs.ecu.edu/karl/3300/spr15/assignments/Assignment7/graph2.gifÔ !Obplist00ÔbcX$versionX$objectsY$archiverT$top † ¯#)*0123IJKLMNOPQRSTUVWXY]U$nullİ	
+ !"R$6S$10R$2R$7R$3S$11R$8V$classR$4R$9R$0R$5R$1€	€€€ €€€€Ó$%'(WNS.base[NS.relative€ €€_Hhttp://www.cs.ecu.edu/karl/3300/spr15/assignments/Assignment7/graph3.gifÒ+,-.Z$classnameX$classesUNSURL¢-/XNSObject#A¾ë	²Ø©H ÈÓ456?HWNS.keysZNS.objects¨789:;<=>€	€
+€€€€€€¨@BCDEFG€€€€€€€€€VServer\Content-TypeTEtag]Last-ModifiedTDate]Accept-Ranges^Content-LengthZConnection_Apache/2.2.3 (Red Hat)Yimage/gif_"645dc-4d6-413f2880"_Tue, 23 Dec 2014 17:10:42 GMT_Mon, 27 May 2030 09:46:17 GMTUbytesT1238UcloseÒ+,Z[_NSMutableDictionary£Z\/\NSDictionaryÒ+,^__NSHTTPURLResponse£`a/_NSHTTPURLResponse]NSURLResponse_NSKeyedArchiverÑde_WebResourceResponse€    # - 2 7 U [ v y } € ƒ † Š  ” — š    £ ¥ § © « ­ ® ° ² ´ ¶ ¸ º ¼ Ã Ë × Ù Û İ(-8AGJS\^`gozƒ…‡‰‹‘“œ ¢¤¦¨ª¬®µÂÇÕÚè÷%<\|‚‡’¨¬¹¾ÒÖêø
+#             f              %OÖGIF87a]Ö €     ÿÿÿ!ù     ,    ]Ö @ÿŒ©Ëí£œ´Ú‹³Ş¼û†âH–æ‰¦êÊ¶îÇòL×6 :n÷~°ãİ~DŒˆ8“åRá¤DŸiÅJ-NyXìğá5Çä²ùŒN«×cI™Í¾óZ=İéù¾ß´÷'(XhÈtèG˜Èø´Ø8))ø89Si™IwÄ	¦ÉX)Ôùi¨T‡Iú•ºZ‚Êªú›á*ÛC[;y‹ë£»KéËÚì8,Û–³SL|!¬Üê9Ñìí!=½á%ZÍB{İ]¥nt\®¾ÎŞîş/?O_oŸ¯¿Ïßïÿ¿LÀ£4b\WëÂg¡oÚi‚(b86d0N”ø‘Z¬0CöchÍb«dY–C	†âÚÁn*ÎVÓYÎ›0vÒäIÊgºG£
+µÆ€äÑ„W d\
+*B©r¨f³úC(?­XátÁuiØ™c–ü*nZ¯N	Š\»@ÛSb›¸|wîU´‹ÊŞånŞÁ„>Œ8±âÅŒ;~9²äÉ”+[¾Œ9³fÌFO²í¼™„(¿šŒ’n3—Gozi N"X²Ô£ıbVÓéFVdÒ­wõÈ”´ƒë‹¥ÂWbš£ô³ÀÛ&Í#¯snÍó=ÿÊ×­İ¹î¾NT<)ù„|‡¶Eïœõ÷¦®o®¿|ßR~ÉûõÓÑ_iÿ­à'v`P>W‚k9\´öUoÚ=8•Aæ…R‰AX—b ò4â.%t¢‰J1YŠŞUæ¢=1*3c<5Ò¸¢r›İ¨Øø¸ÑŠ@ê´ Cs¤× w‘¡2d½Å¦£ˆ&)	Õ)İvGETe·áo…éÒduã4Æ$†{A†¤zˆ™c›n¾	gœrÎIgvŞ‰gØzîÉgŸ~ş	h ‚Jh¡†Šh¢Š.Êh£>
+i¤’ÎsŠ¦%šÜVO…‰"…û˜%¡ÉpÃ¥Š˜j!•VJ §v°Z•[²Êqd‰i"Ã^ª=UDj$M—¡MÁjºÉ”Ë)^½ª°E—QŠùk-ãk—ĞŠİp"YûW\ÔÍ'Û…ÏnÇ¢±ZL‡.¬T‚;.Ùz©`¹1¡‹Nx±škÜ+Y®+ã°×:Ë.¹âÜm´Ø!+-Xf]y0nÂI¢®Àœ,Â¾Kã·^,ñ‚­:i¾ÿ,kÉìœ…ìê§(³uÉ@¹`È0Ç,éÌ=EjóÍ—¼3Ïæ|	£@­èĞD#jt}‡&­´9©©#–ÁN8+‡³aÌ—„2´©ğšéğg_~]µÔgÚU³gíÆ9PWHpÜIÈ‰|"¯ù'×áò©÷Şzöí7€/1¸ŠhæY8á‚·xgâÇÒéøãrF.9œ”Wîæå÷¶©ùæB†Öù!¡{şßè Ñzê¥«¾:lo/fú©’Éº•²ú:ìZs¨ñ’åûö2ÆíÚdÑU¼a]äğË¶÷óĞl—–n;{ˆüÊ¶z7oö[-<V`Ÿ–ÏéK	±úíëv÷LQÆæíRï®İ°ÇÆüÊşÿÀ 
+p€, ˆÀ*pl ÁJp‚
+¬ /ˆÁÎ©  ;_Hhttp://www.cs.ecu.edu/karl/3300/spr15/assignments/Assignment7/graph3.gifÔ#$%Obplist00ÔbcX$versionX$objectsY$archiverT$top † ¯#)*0123IJKLMNOPQRSTUVWXY]U$nullİ	
+ !"R$6S$10R$2R$7R$3S$11R$8V$classR$4R$9R$0R$5R$1€	€€€ €€€€Ó$%'(WNS.base[NS.relative€ €€_Hhttp://www.cs.ecu.edu/karl/3300/spr15/assignments/Assignment7/graph4.gifÒ+,-.Z$classnameX$classesUNSURL¢-/XNSObject#A¾ë	²Ø´ ÈÓ456?HWNS.keysZNS.objects¨789:;<=>€	€
+€€€€€€¨@BCDEFG€€€€€€€€€VServer\Content-TypeTEtag]Last-ModifiedTDate]Accept-Ranges^Content-LengthZConnection_Apache/2.2.3 (Red Hat)Yimage/gif_"645dd-46f-413f2880"_Tue, 23 Dec 2014 17:10:42 GMT_Mon, 27 May 2030 09:46:17 GMTUbytesT1135UcloseÒ+,Z[_NSMutableDictionary£Z\/\NSDictionaryÒ+,^__NSHTTPURLResponse£`a/_NSHTTPURLResponse]NSURLResponse_NSKeyedArchiverÑde_WebResourceResponse€    # - 2 7 U [ v y } € ƒ † Š  ” — š    £ ¥ § © « ­ ® ° ² ´ ¶ ¸ º ¼ Ã Ë × Ù Û İ(-8AGJS\^`gozƒ…‡‰‹‘“œ ¢¤¦¨ª¬®µÂÇÕÚè÷%<\|‚‡’¨¬¹¾ÒÖêø
+#             f              %OoGIF87aPÍ €     ÿÿÿ!ù     ,    PÍ @ÿŒ©Ëí£œ´Ú‹³Ş¼û†âH–æ‰¦êÊ¶îÇ² õŒ·±}ı"Ã 
+Pt ÌL’×x®¤5éÁÚtBzVl¶„‹ÇäíÃkêš¿ÂíøÌ3–D4LlË§</}(¸g7hxˆT˜ÈØèö)9	Iiy‰I±˜ÉÙy¸é*ÊfÇ5zŠjÃšêúú±
+;K"[‹››‡·p«{¤áû«ğdª4l¤vE„¬u¦ÇÜŒ#Ü*½±Jm}Â»›­jü->N^n~®¾ÎŞîş/ÏôÃ=?a?}µÜˆå-V0WÔÒJrƒÊ€uÈ8|1¢Ä‰'ÒˆÆî–Ag6şëàqŸÈk#K6
+i2e•È,¡l	dÌ™M^Ò¼‰§N şØÜyï'Ğ¡Õˆ­t4J>ĞZ.J˜tœœñ
+ù	ZQâTåeêNãÍ2QËj+f6­ÚµlÛº}7®Ü¹tëÚ½‹7¯ºpU¹úó«—ãŸy|Á
+iúq+Ÿ¿Š3ü¥ãÈ“a0Ld_©
+*–:ÊÏdba{5­jÍçL›vÌ
+û!¡Õ§_(;º«êÒ0Ó¦zÊ›ïĞˆ—&C™à…*uR1Şœæğè©¿n=öìç¶s/çıû¸ğâ¿‘/oí<úfê×ÿJî~gûø¹æÓ¯õôşHY|õk÷?”} *7 sxàX×1WGLÈÖ–0JRÌhµ%Õpğ”²ÛQVaÄ[’ÆAl&fEI@2¢âZîW"\ğ)å n	ŞøL+âˆIa<šÎ?Id‘F‰d’J.Éd“N>	e”RİNIe•V^‰e–Zz]X>ØßfüŒ9`˜êh¡~zÉbQl¢9X—ÇÅ™æJŒÑ#gMnşƒÜ„3ã[.ü™GI­Y¶Ü,ü¦D†<”JAbêH&‰j–›oÎ†„ŞÑh‡¸V©¥ëán şF©(ù©JÊ‰²^Æª§ƒŠú)'¯>câ0b]
+«ˆ¡|â©´êl®£›¬±½ñk¦1Zkj‰ˆ©¡uB[,¾lŠ©ø=®Q‚F
+§d„n9,»æ”ë®gñ7/½õšw/¾ù¦·/¿ı²÷/Àû•:0ÁëïÁv*ŒÃ¸$ìp+:1Å¿ñÅ2iÇèzÈ!‹ì*>Û’œ±¥¢LÙ³'³Œl·+ÃœC´¶Ò,ï5/ãÏ—dìsµA2tŠEOôÑ¦*İ&Ó$­èuAéUnQ=òÌÊ™7XKËÑ~V}]²RÛ’­§&#z(ôÚÎ~z[YÏ½ŒvÍ‚•ÊÍg¾m6³DÅmõ;z‰¬†C¤)¯®˜h‡¯»—-Ô&ÖWAI®Ö‹ûXá±†B×ƒ0A^h^dÉ7Ù¹Nonİ"3xçêœö±³ì1/m{Ê{æ‡º®ó|ğÂO|ñÆ|òÊÏ[  ;_Hhttp://www.cs.ecu.edu/karl/3300/spr15/assignments/Assignment7/graph4.gifÔ'()Obplist00ÔbcX$versionX$objectsY$archiverT$top † ¯#)*0123IJKLMNOPQRSTUVWXY]U$nullİ	
+ !"R$6S$10R$2R$7R$3S$11R$8V$classR$4R$9R$0R$5R$1€	€€€ €€€€Ó$%'(WNS.base[NS.relative€ €€_Ihttp://www.cs.ecu.edu/karl/3300/spr15/assignments/Assignment7/Kruskal.gifÒ+,-.Z$classnameX$classesUNSURL¢-/XNSObject#A¾ë	²ØÀ ÈÓ456?HWNS.keysZNS.objects¨789:;<=>€	€
+€€€€€€¨@BCDEFG€€€€€€€€€VServer\Content-TypeTEtag]Last-ModifiedTDate]Accept-Ranges^Content-LengthZConnection_Apache/2.2.3 (Red Hat)Yimage/gif_"645d8-1d5b-413f2880"_Tue, 23 Dec 2014 17:10:42 GMT_Mon, 27 May 2030 09:46:17 GMTUbytesT7515UcloseÒ+,Z[_NSMutableDictionary£Z\/\NSDictionaryÒ+,^__NSHTTPURLResponse£`a/_NSHTTPURLResponse]NSURLResponse_NSKeyedArchiverÑde_WebResourceResponse€    # - 2 7 U [ v y } € ƒ † Š  ” — š    £ ¥ § © « ­ ® ° ² ´ ¶ ¸ º ¼ Ã Ë × Ù Û İ).9BHKT]_ahp{„†ˆŠŒ’”Ÿ¡£¥§©«­¯¶ÃÈÖÛéø&>^~„‰”ª®»ÀÔØìú%             f              'O[GIF89a¥÷       3  f  ™  Ì  ÿ 3  33 3f 3™ 3Ì 3ÿ f  f3 ff f™ fÌ fÿ ™  ™3 ™f ™™ ™Ì ™ÿ Ì  Ì3 Ìf Ì™ ÌÌ Ìÿ ÿ  ÿ3 ÿf ÿ™ ÿÌ ÿÿ3  3 33 f3 ™3 Ì3 ÿ33 33333f33™33Ì33ÿ3f 3f33ff3f™3fÌ3fÿ3™ 3™33™f3™™3™Ì3™ÿ3Ì 3Ì33Ìf3Ì™3ÌÌ3Ìÿ3ÿ 3ÿ33ÿf3ÿ™3ÿÌ3ÿÿf  f 3f ff ™f Ìf ÿf3 f33f3ff3™f3Ìf3ÿff ff3fffff™ffÌffÿf™ f™3f™ff™™f™Ìf™ÿfÌ fÌ3fÌffÌ™fÌÌfÌÿfÿ fÿ3fÿffÿ™fÿÌfÿÿ™  ™ 3™ f™ ™™ Ì™ ÿ™3 ™33™3f™3™™3Ì™3ÿ™f ™f3™ff™f™™fÌ™fÿ™™ ™™3™™f™™™™™Ì™™ÿ™Ì ™Ì3™Ìf™Ì™™ÌÌ™Ìÿ™ÿ ™ÿ3™ÿf™ÿ™™ÿÌ™ÿÿÌ  Ì 3Ì fÌ ™Ì ÌÌ ÿÌ3 Ì33Ì3fÌ3™Ì3ÌÌ3ÿÌf Ìf3ÌffÌf™ÌfÌÌfÿÌ™ Ì™3Ì™fÌ™™Ì™ÌÌ™ÿÌÌ ÌÌ3ÌÌfÌÌ™ÌÌÌÌÌÿÌÿ Ìÿ3ÌÿfÌÿ™ÌÿÌÌÿÿÿ  ÿ 3ÿ fÿ ™ÿ Ìÿ ÿÿ3 ÿ33ÿ3fÿ3™ÿ3Ìÿ3ÿÿf ÿf3ÿffÿf™ÿfÌÿfÿÿ™ ÿ™3ÿ™fÿ™™ÿ™Ìÿ™ÿÿÌ ÿÌ3ÿÌfÿÌ™ÿÌÌÿÌÿÿÿ ÿÿ3ÿÿfÿÿ™ÿÿÌÿÿÿ   (((555CCCPPP]]]kkkxxx†††“““¡¡¡®®®»»»ÉÉÉÖÖÖäääñññÿÿÿ                                                            ,    ¥ ş ¯	H° Áƒ*\È°¡Ã‡#JœH±¢Å‹#²Bb€2ŠI²¤É“×X©DÉ²¥Ë—0ZQ Š+WÄÜÉ³çKVVVt\È§Ñ£H_Z¡‚Á+¬$Jµª@V9oz\áÔª×¯`¯=’ V®aÓª©"*AœOÖÊÛ²c×§ îÒİË÷mÛ‚¬<–êK¸°ÃÀ ¬<	Ê€Š²†#§	y cÉ˜1Ÿíø±íG•3‹F
+5êâ¨UÆJÍš.â”°ÊnM»çVÎB·ê¬Í¬İŞÀ}~9{vğãI=®&è84òç9:‡N½çÒ¦Ÿ@­Î]bĞİoşíNŞdĞšVô´%¡·¼ûƒ—_ô±ıûû=ÁmEo ûøqGT7UÑÜ@ÿ¨ F+™¥‚|rXn‰fxfÈ †å©` Óq(âˆ$–h¢BıxßM*ª„-VTŒ'’E#yÛİ8â‹:r7c"‚v+ÿ5d_9i˜J€lbF<*D¤MV€¸‘U ¨$X?2DäR7²Ê–>±B¥‡ †y‘	m¤å5j’i‘Aiæ›%™ĞMıyø%HxÊ	e•	‰ÖD¬<˜Ğ¡=)¨F7)Ğ•¢ˆ¡A@-Tˆ^ä(CŸFôB0JW§Ä¡éi«ÿ^^ŠªEXxX‚Ei–¬^–:«e9Q—áú¯¿‹(§¹"«)³ò*¥±¥Q¦É"ê,Š•®Ú-B¡ş
+Í¶	‹µ‘›­LZQ¸“2:Ÿ¼)AK¦´Y[¶Ñ}».œşÄï°® Ç[$äî¯è¦[­Àª˜sæş»ªAPµ·Ôtúz—	ò)Š©½GVQN¡aUjÅÌœ|3¨î¿ğw²[2L¼–€`Ä€Í¬#Ëp¯´BLjÂ‚Kòº{ÔÊ¤RÄs¼]Ñ—É¿v'›&FªÎ–A.Ğbœô¯¼ÖwóÊk[†'›+,|2Ù*ÂxÙÎş®Jü4»—5ñ/TªPíé!äA Yéøã»iiJFŸœ¬¬TTÊGåş]¾×ä¨5á…/
+_å{cüßêD¶Îúë@á‘yí‰·‰.ÚRøÆ-³³‡î,è…^{x!ÚıĞÕWåE,à³êö¤icê»XR’ØÁå^ÿ¨××¸ıÎA[mTää½‰z§?oïı*V²—Ş¦}ˆ´ßt¹+kéñj»œLª'=pî Ìk³ìºÜ_hâ£¾ÛL!›£×[,h"t¥N ¥—•(÷”ô`æÍ‰YQŞ[²E´İå<¾"áŞ„<é°páşBLT8‚>9Ğ[ïòœ`´•ô¨oõz¡ü@>ûY0cÊT²¸bäzD›Uq²•ğnÕº]ÿ¬ø*„¬O\Ã4~ˆ±â•T)ü¶ØØ+‰"IWéÖÈR„ƒÕÖºcå1h•J”x¤\k}<%ÿµ ØªPUÌˆ† ka²E}
+¥A,Y’M­J*a\ä¤*ã¦)ò$†
+Sšât•MÒÈ\®”’*ÏU%ûi‹À’eùVy@T‰O’r‰JXWµuAèE‘M)*‡Iq1)ó%ªˆç!Ø¤…dª"S%q¶ä”é4ÛhHI¦Xûÿã^ğ	$xV…v¤
+ÇI~&k˜‘A¤Š =<òFöÌŒ>OdĞÂ(TP†?´Ñ¯04zÇùèB?Y›vğ¡j¹(‡‘Ê©¢šqg€TjÑâ¡t-%QNEQA¹t4=%ÑD3³S ÁT£z™¦.EdÒµUI4%êUî´º+É”6Ee¾è´‚*ñ§ÊjkÒäĞÎi<OåT(¥±H‰ÈCòìe‡f6ÔŞdô8ƒ3ÜU[ãÌÅ<3(V*+ouS°ĞÉIiê^„VWŞĞIKDÈ–Ö{‚©H_‚fy.ÚÈ¹Fò¬À+AÊJÉ²°r9ªß:ä¹"=‡’È6şy•±Üµ0·lÓ^÷ÕJ(n½íÏÚ²;=©V-ks-r6!Æ1J±j9®‘ã+ú@(srMAKC¨XL1ËnérÛ…w.WK”Ï˜C/Ñ‚¥·ĞµŠ=­[†&¾å`eP¨@LêÃLcŸrœPö½SCmXÎ+]Ş*d@‘šõ0ƒÉıâÖRËáÒcájö†„B±†@:‚ó"‚_èÎÒ3ŠW-`%pˆw™$¸ñÃzƒÏü]ƒÄ¦.”^ì•m©,tëU˜dà9`ºàX}nğ„…œO&PR;ã2SŞ†t˜/FæN´„ßªXNÀùèw¸ş9ÕÈ4xËµÑa–¥Õä¾øóÌ†`¹“äœ-yÈiïØ<ÅŸeF
+¹f‚¬DwoN­½> ×ñ9îroè_§aÆÊ_óª@Ö9è„ºX†®
+ˆáGá<Ö½ĞìØ¨ÓåâF²ÁnAÌß<:ZÑæ¥sªÁãSùg[ñ´v=EdÃâúwÓ#pu¬±¾_O¥³ó‘J«a[B¼Óv"ÉÓäL»y«İóöNŞé¾ øg6+–µMÙyÿ³OÌ-O}iï¤Óœ¼‹]Ú0ıß›¦¤¹•l¦„Oh¶aŠÙ+‚;v%êŠ¾ËUkµÖK+KĞ¿ó­ÿÌkçÔI‚•xp^¤‡RTµá%§
+ÕéV4wgá÷ù’˜2s@²“SëËÓñÅ8~Å#„s£›œ:MÇOÔ~â~ûÄê´q9Õ5ƒõ˜,=B¯ŞúµU®êzv]ìy÷‡Íö˜nšçÇîÜùrjœªphçÊÔÇJv£€QCC7ui´"î …½È3”næSÆg*îJáñóõCC„Ú©Tº¸"Ç¥œVëNHjxÏ“ä¨d¼ËR øÃ§–OW²‰Â çß™°ôûLS-}ëß¼¥«¸OóÆGÎÁó	K9;rMï«bv#Úˆ†£e÷´ûœ„ŞÙÆ1Fé­şğÙ##Ú{+‘Ù¦í+>ÇWŒPT÷sÚ¼ùêêôU$V"ğM3š0¬óåışO<Eç`éR)º6¸SñU»Ôwo1&ÁR)ÖuÅ¡ ÊW˜L
+¢Gj·#€"0ÄgxYÒ(PÄ|_xÉ±/ä’;o!"¥ .¥@Z&qju“$Øx¬QyÅ
+C¡7‘yÒƒ…1Q„Z‘6L©'1-„5î!~Iá+ÁyWX:4!İ‡„6,"ÈlRÒD	È)Q{‚‚"AHAÁ4¿c†“â/¶”!&~aÔ†şácÒJİ§=øñ'‘¢†1LL±6T,2ƒÿL—D#AJßu¶Jİzm$#ÅÄ
+Ö T#X6Xb€Ò.Ô.›ØçÅk!-gQª¡l¡'ˆÒ¤êC…0¡CòˆĞ*èfW…hmRô‘Q‘6:xÕ‰(â…"¡.D„/çõ<­çk„/Wÿ×f3ÈaŠRâŠyÒ«×hÕâ†øaeQ‡NW˜}Óe5}¶vfR¬wcÕ’‹÷i]…>^÷Xøhè³Áöp&zÀ]™ñf²ˆÃ$yZ¡4ˆà¸"€–bm¢R‚†Ò÷Y'Ní·nÎ¿a‹«%Š
+r})OÖB Y,ØŠÀ1Š<AH©Ø<ÿ¨óEòH$¹‘r¥>b3“™ô.é8V¾¶XZ8vˆ;Ù.7énÆ‹«$>Hù9Õ‚j5”èP”Y”]EåÁd5PfoĞ¦7çÂê¸c8Eâ„I ÑÖz»ˆR—’’ˆQ×<µ¡“óaŒ¹¢u}x‘¡uj9({KùyéG~	Æ”xYçEŒi×˜ $S¼£$áz$9ñ&Ì¨6¸rÕv°h8y“•wzæg[x²q•,K×š2öJ.Âd“‹şâ|™¥—óš?Éé †Â™s!¬ér.é%ƒë‚mù¹äWŒ±›­&‘ÑXÿU¥Y"œm·3“H˜^¢$šùQ‚İCzo¡bÄEqã¹Ï™*óQs½Ò-@Œ’TŸï¢K¿Yš[â=ò!Iö’4cZ J+ciÊ«°I¹c(¤4`&£º¡F±I0Ä ç(Ç¡$êwBSQWò;äz%Ú¢Á‚ŒkãM“.Z£sÖcnâ)L6Ú£-1%7A„ŠQy§[>z¤Ò4ğtŸHÚ¤Sáz¶é¤RZ®gSz¥‚†‰¥\Ú¡{¥]¦ÉšÈ)¦=je‹i¦j¢ñ™kú¦äÒŸpÚ¤ËX§xÚJŞc™yÚ§Vƒ7[ê§‚Ú¦¾c¥ƒj¦ÿ
+J ‡j£â™š‹ú¨Ò7|W¦Z£	èL1;Z©œš”Ø© ª¢:ª¤Zª¦zª¨šªªºª¬Úª®úª°«²:«´Z«¶z«¸š«ºº«¼Šª‡Šu£¨½:“W‹Ãº¦¯A}·w¬Xªƒ±
+”ªRÔZ­~z…c¹¬¤Ú‡Ò×
+•!¬ê'¥`( P®¬€®×
+~)­±ê¬‹ªƒg‘¦oš¬ñ*b„²*„	§gô1*ï‰‡*DeAD”Ú¢ğZ°d‰âê¢öZ°ëÇ7œÇªüš°|´° D°Ë±‚±æ•§ª±;ygÁ¤¢
+²;±a@æ8ªû¨ÿ$‰ÓHªÆ¬ßÚ¯8¦*»³õê{>´B;´D[´F{´H›´J»´LÛ´Nû´PµR;µT[µV{µX›µZ»µ\Ûµ^ûµ`¶b;¶dKQ¿$e[?R7¥¡×¶¿3¢®±+×£ ÈSŸW7´ò¶|Ë¶ÚŠ‹£+_ex`êå4¸”F —a±ª'²ò“¸T)éy=»<ß·¹‰K@Uæ¸INÂø,¢ñP]â'¬ ­+€® 'rÁªç¹yBrjQhéwî¤º@‘1ª«¶bÙ|´k@– +ÖÀ²º™[€i¡mÓ5KÓKFl’K9AIœÿ>:›* ³4‘Ô¦špŸ qå‘Ë¶€Á®¿^í1lğ‹)'6,Ù[.Ñ¤3Z²
+f(Õ§)å‹@pÈ8I6‰$²7«?d±zÊQ¿áV[QdD–?Ó¹@“w6£aPáæÈ*`„Ş™]!yMt3ÿÁ.8ß×‘â•¿×…’EîJ*&D_“»^¥LÁÜ8À8¼Â)L;e+™m4Ñ‘5ÛñÁÄÕ3Kf ±
+?¬A«—¸’%D-MqÁlæU”Ö18‘ÄÊ
+ Õú@'™n0D ‰A„< Up%úÊ; ƒ¿yß¢wª‚2¸/$àWÿ!„  ƒ~ ›yÇ,ÉGw»À€ÜYÈZ!¹,ö9„–ÉlLF7ÑÅ ²¿ÔCDEØp Ó†Œ»İøÉn›5 à¶è‰¥<?¤B{añÌ'î*Æ]e…Ba ¼l4ÓZ @[³Íë®wÙ3Œ²zsC°Hé“ÔÃ(Ğëì:Ù«m»<MÙ¦…I‚C®…e9†t|¦ÛÌâ¼±ĞÈ±™«½’'|Ã&ÄYi-@8±‘¸ÌWÁNüÊwqÈî¬bl-g±x(1îjcAiÿ¥Íæ<Í²¡¼˜²Æ!{)©cÑÑ‹)émè>ÍkÌ¯äM»ò'ÃÊ¡9Ù«aßQ|ÿ}öÈÉP&:,0ÅKFç73/ÍÅK9p½òg@à&> ,/$=ôÌÌ;M³sFìk^Ñ–9íÑíºbÛ¸E½K‘œìÅó…¢m§oï»½ÌQ¹-<Îp¢¹B"Ó<qí‰,\)eÍÖÜ„˜¹°°ËÑIÆ×%Ö ²Ô7s)ÌÉâL+14ñÏgíØh}!v3}×ë ÇÃĞ‘×"Öùl¨U}ÆÎU\\~Ç§u½+«Ô;ãœ…@²60bØØÚb»²½Kq*0×¿S¹”³ÚÎÕØ“…Û«Ù–±8Í5Öà!€qÀ¡ëpY{ìœ$ò7ÛšìÊÿµ½qõÓ<™2i£Ù)}¼×¼	@öé÷Ék5¼Æ]Ë»Şş×o2Àö
+Á9á²wQÍ—ÒÎzĞÄ\¬dcıÕ{ÒÖ!>>Ê&:ä}Û$è>£.†ı{"nŠ}<“7fGÙ4k8#Ÿ=@Û½öÍ®óİ‡ï#%½±¦=) #±Q(}ÕxÊÍ¦¾ˆ#-şŞÉ]s„‘+îÂ×ÅzşİÏÉÓPHäy[nÄ8İÜÑvdüGGzH9àqİ IÁ ìãÔLc+„\­·ã‹€Ğ¾˜r@6
+Õ~<ñ}æ¼(œ=)ÏÙ
+üíá	ÁÙ)Åÿ'#ßRàŠ«XÁcNz#~à ’½öÊµ×ÛX^á!4mãAç.~ÖNÜßğ«^ n9²à7‹ÜJÜó±çÏöáÌÆ•³qTx~ã÷µ8m9>»Û=†àX€>„Õ“T5®?nÑÀ%¦ãĞ††›~VÛæÍ]æk.ÉÂ«åHnİã‘Oæ‘‡rÓJÍ(ŞMâÔ×I[>ÅK˜	Ô¹şÑ˜“6È|¿ÈÓÔĞÆ(üœàĞ,>ÂœÛ@£Ê®’ä]\Ó#Ğø¨ÉxiØçq!D.AğæÍ?4ıj¯6vëOIG6†ág´Ï\/”ê€dpd0àÕÜ@Ì¯–Íı>æÿÃºea_…òã».eÚÛpmb1Ìÿ¥iÇ‰•!aìÌ]ë¼ÈÈkæë»Öí“Íìk=@ò‡C—ü½âN.®]€V¾*¢ÌîZîìØå@Á›÷„×æÄ›Ê¹"ZO@Pñ ³l¹œQÁ÷d„—ma0ŸL>Ïì;^ç¯²¸~hº_Ìgro‰{0=}ók5ğöŞĞj}{øİUzÁhŸCÜX!ÜÚ{MÑ×)/İw¢YØ¦•NØ‚é¶§éŞåÓCñİá¹W\Èö!ÑŠ›Ã|è\‰K1?ÜÖRÎŸJãnØ^vtÆ9¯¬ m7…¥ü‡±üşDŞGQ½b±…i·ÔÕ"Òõëöø 
+áÔAîÑH§0FÜU‘çõ©¸ìßB´¾Œ±G¯ÁBş1÷ö×$XĞàA„¬‘XÁpE „%N¤XÑâE‹1näØÑãG!E<ÈŠäI”Y­LÙÒåK˜1eÎ¤YÓæMœ9uîäÙÓçO A…%ZÔèQ¤I•.eÚÔé5“O¥*´ÂÊT¬U¯ŒqÅ
+¬¾Š¬ªÑ`•'+º»ë[ t•ë.ÓºÅš-¹@X `CV±zğë\‰VÔŞe|“!İÂ—dV±İƒVørTˆ¹£ z~U±adÉ©_ú¥şÀ³ê¤ 7#M‹ù°i„rgÃæı10d·¸G
+7È
+Å•¦‰ŸÈòó
+Ñ­9¹¼ v¿.®(Vpoğõ PÀªkuY.ÿ°øá†»ÊmŸİtUó_AŞ¿¢½à…Úó¬*¿ü“-øÃl=óTxÈº¼XÉÏµ„ü"ˆ@òT°Â:	¿ÃN¡xÂºk«b ÿH ± Ãs£@¬pĞ*“lÈ
+Å~»0°‡Ën"¹¬ŠÑ?»ÓĞ
+=3k!ì¬jò! ªÈÑ½‚|(-››Ç'	jR³¼æ2¨û
+ÇˆÓËA0”È».;“4î-ºíV,(,_ô³"ÖÿªäQ¯'(¨C³X)ôµt<4Ğô ÈÌ*ıÚğPó,SS*¡òKÌ3¹
+L£!û+¢ñ¢ 1Å:õıôú4¢ãTPVV%ªÖY7K…?ƒ•ÈÑH_¨*`
+•«†hëÂıEm Ç%VC}5Vf¿+NFƒ°Ó¨ª½ŒÖNÔS!†´İ3]óÙy4»¯Jv£k…õ×ÕÖ¼…jSVÊÃÛâxÔ×¨ô(Å>-ÍSÄ
+bHÌÌ"“PÃ…ÓËV¶7-Há…k4[kí-±@µÈĞŠı•ùšj¥}A¨]AJ.qô«”ˆ‚dèÒ’Ö3ÓQ&¯#/±şr†jè}™ÖeìuL†D$:±t§=hÓ§ÜD8'õšÀÄ[eÃ:YXIóu1üB´[eÅîÖ¼'r¬T`„G¦Ûî	¡£´5\VZ»Åäã\5VÑ»ßä¹u¥÷šñÜ¦¨ŠÈß–X­<µT¨Rïx¥)·bÅ¡siæNn[×’wàÅº2Éº/„@ŠËû@2Í^÷ë—ËlhsÓçİíˆ°Ã¬Ššõ\t™v !owƒ‹k-Ä•İ¹ R up6ûª‡Åh•~W´r¢ó
+_Å>â˜lUÏÛALd:¶DRØóÓW€ƒ }-N[Ä)³şœ¶@ÍîG^ZšQäµ¦'I/óKtó<æy©klÛôdµ¯÷xÈs.ÌLhæÓ¢Š8¨c¼‹_Ğ“2¶ mT^*`İš­°in£!¯Ü7»!ª|¹!ƒÎ—AİñÏ ©”Ênw(Z«NF´Õfx]FR¬ĞÃl~ÅÃ`åË=Äõ3%1ä	1…#×p‹{«²ÈîuÇ-§iBò‘ôlÅÈå-§x‘rHDÚ%Æ5)^†<áRÈAFÍh^/Óÿä
+Ò{cÌ›kVDól-ƒéàx¶²>ˆ¹obU"A{\ÙÄæ	Ğ ˜'$Ëù lJı»ĞaÚKÓªË…ÎZ7‹ae¥“‘ğz¦ä&[vê'œ-'rºSN™$G*eëf;İùN”ó¤g=?hO|æ“›IÂ˜>ıùOŞx G	 ;_Ihttp://www.cs.ecu.edu/karl/3300/spr15/assignments/Assignment7/Kruskal.gif            1   <   N   d   ‚   ‘   ¨  ²e  ²o  ²u  ²À  ²Á  ²È  ²Ñ  ²ç  ¶à  º¬  ºµ  ºæ  ºï  ¿  ÃÂ  ÃÌ  Ä  Ä   È5  Í¿  Î
+  Î  Ò(  ×  ×M  ×V  Ûk  ßŞ  à)  à2  äI ¨             *             ô

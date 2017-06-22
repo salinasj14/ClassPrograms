@@ -1,0 +1,345 @@
+bplist00“_WebMainResource_WebSubresources’	
+_WebResourceData_WebResourceMIMEType_WebResourceTextEncodingName^WebResourceURL_WebResourceFrameNameO!·<html><head>
+  <title> CSCI 3300 programming assignment 4 </title>
+  <link rel="stylesheet" href="../../3300.css" type="text/css">
+<style type="text/css"></style><style></style></head>
+
+<body>
+
+<h1> 
+  Computer Science 3300<br>
+  Spring 2015<br>
+  Section 001<br>
+  Programming Assignment 4
+</h1>
+
+<p></p><div align="center"><table>
+  <tbody><tr>
+    <td><b>Assigned:</b></td>
+    <td>Wednesday, February 25</td>
+  </tr>
+  <tr>
+    <td><b>Version (a) due:</b></td>
+    <td>Wednesday, March 4, 11:59pm</td>
+  </tr>
+  <tr>
+    <td><b>Version (b) due:</b></td>
+    <td>Saturday, March 28, 11:59pm</td>
+  </tr>
+</tbody></table>
+</div><p></p>
+
+<hr>
+
+<h3>Table of contents</h3>
+
+<p></p><ol>
+  <li><a href="#pq">Priority queues</a></li>
+  <li><a href="#test">Testing your implementation</a></li>
+  <li><a href="#submit">Submitting your work</a></li>
+  <li><a href="#late">Late submissions</a></li>
+</ol><p></p>
+
+
+<hr>
+<a name="pq"></a>
+<h2>Priority Queues</h2>
+
+<h3>Priority queues</h3>
+
+<p>A
+<a href="../../Notes/DataStructure/Queue/priorityqueue.html">priority queue</a>
+is an <a href="../../Notes/DataStructure/List/list.html#adt">abstract data type</a>.
+An instance of a priority queue holds a collection <span class="term">items</span>,
+with a <span class="term">priority</span>
+associated with each item.  You can insert an item, with a given priority into
+the collection
+and you can remove the item with the smallest priority from the collection.
+</p>
+
+<h3>The assignment</h3>
+
+<p>For this assignment, you will not write an application,
+but just a module that can be used in other applications.
+Create a module called <b>pqueue.cpp</b> that implements priority queues,
+with a header file called <b>pqueue.h</b> that describes what
+pqueue.cpp exports.
+</p>
+
+
+<h3>Generalizing priority queues</h3>
+
+<p>The items in a priority queue could be of any type, and
+the priorities could have any numeric type.
+For example, an item could be a Widget (whatever that is)
+and the priority could be an integer.
+</p>
+
+<p>We do not want to commit to particular types for the items
+and priorities in more than one place.
+Put type definitions
+</p><pre class="ccode">  typedef const char* PQItemType;
+  typedef double      PQPriorityType;
+  typedef void (ItemPrinter)(const PQItemType&amp;);
+  typedef void (PriorityPrinter)(PQPriorityType);
+</pre>
+in pqueue.h to define type PQItemType to be 
+const char* and
+PQPriorityType to be double.  Type ItemPrinter is the type of a
+function that prints an item, and PriorityPrinter is the type
+of a function that prints a priority.
+<p></p>
+
+<p>Write the entire implementation of priority queues using PQItemType
+for the type of an item and PQPriorityType for the type of a 
+priority.  Do not assume that PQItemType will be const char* or that
+PQPriorityType will be double.  You will want to be able to
+change the above type definitions later.
+</p>
+
+
+<h3>What to define</h3>
+
+<p>Provide a type PriorityQueue and the following functions.
+</p>
+<ol>
+  <li><p>
+    <b>bool isEmpty(const PriorityQueue&amp; q)</b>: 
+    return true if q is empty.
+  </p></li>
+
+  <li><p>
+    <b>void insert(const PQItemType&amp; x, PQPriorityType, PriorityQueue&amp; q)</b>:
+    Insert item <i>x</i> with priority <i>p</i> into <i>q</i>.
+  </p></li>
+
+  <li><p>
+    <b>void remove(PQItemType&amp; x, PQPriorityType&amp; p, PriorityQueue&amp; q)</b>:
+    Remove the item from <i>q</i> that has the smallest priority.  Store the
+    removed item into variable <i>x</i> and store its priority into variable <i>p</i>.
+  </p></li>
+
+  <li><p>
+    <b>void printPriorityQueue(const PriorityQueue&amp; q, ItemPrinter pi, PriorityPrinter pp)</b>:
+    Print the contents of <i>q</i>, in order from lowest priority to highest priority,
+    to the standard output.
+    Use pi(<i>x</i>) to show item <i>x</i> and pp(<i>y</i>) to show priority <i>y</i>.
+    Write the priority first, then a tab, then the item, then a newline character.
+  </p></li>
+
+</ol>
+
+
+<h3>Representing priority queues</h3>
+
+<p>Store the information in a priority queue using a linked list,
+kept in increasing order by priority.  You will need the following types.
+</p>
+
+<ol>
+  <li><p>
+    A structure type, <b>PQCell</b>, that is used as a cell in a linked
+    list.  It holds an item, a priority, and a pointer to the
+    next cell in the list.
+  </p></li>
+
+  <li><p>
+    A structure type, <b>PriorityQueue</b>, that holds
+    a pointer to a linked list made of PQCells.  This pointer
+    <i>must</i> be initially set to NULL by a parameterless
+    constructor in the definition of PriorityQueue.
+  </p></li>
+</ol>
+
+<p>Define type PriorityQueue in pqueue.h so that it can be
+used by any other module that includes pqueue.h.
+Other modules do not need to know about
+type PQCell, and must not use it.  But the definition of
+type PriorityQueue needs to use PQCell, so you need to
+tell the compiler that PQCell exists.  In pqueue.h, just write
+</p><pre class="ccode">  struct PQCell;
+</pre>
+to allow yourself to use type PQCell* without providing
+details about what a PQCell structure looks like.
+Put the full definition of PQCell in pqueue.cpp, not
+in pqueue.h.
+<p></p>
+
+<p>Put implementations of the priority queue functions
+in pqueue.cpp. You will find it easiest to
+implement insert if you provide a helper function
+</p><pre class="ccode">  void insertCell(const PQItemType&amp; x, PQPriorityType pri, PQCell*&amp; p)
+</pre>
+that inserts item <i>x</i> with priority <i>pri</i> into the linked list 
+pointed to by <i>p</i>.  The advantage is that insertCell can call
+itself on other pointers in the linked list.  That is, it can
+be recursive.
+<p></p>
+
+<p>Provide a <a href="../../Notes/C/Function/prototype.html">prototype</a>
+in pqueue.h for each of the functions for priority queues that other modules
+are expected to use.  Do not put a definition of insertCell, since
+other modules are not supposed to use it directly.
+</p>
+
+<h3>Nonfunctional requirements</h3>
+
+<p>Keep functions short and simple.
+</p>
+
+<p>As always, you must follow the
+<a href="../../Notes/Standards/index.html">coding standards</a>
+for this course, which include the following.
+</p><ul>
+  <li>
+    The program must use the correct
+    <a href="../../Notes/Standards/fileformat.html">file format</a> and
+    <a href="../../Notes/Standards/fileformat.html">file name</a>.
+    Use template <a href="../../Notes/Standards/template.txt">template</a> as
+    a starting point.
+  </li>
+  <li>
+    Every function is required to have a 
+    <a href="../../Notes/Standards/function.html#contract">clear, concise and
+    precise contract</a> telling what the function accomplishes and returns
+    and how each of its parameters influences what it accomplishes and what
+    it returns.  The contract must <i>not</i> be concerned with how the
+    function works.
+  </li>
+  <li>
+    A function body must 
+    <a href="../../Notes/Standards/function.html#value">not change the value of a call-by-value
+    parameter.</a>
+  </li>
+  <li>
+    Do not use <a href="../../Notes/Standards/variable.html#global">global
+    or static variables</a>.
+  </li>
+  <li>
+    Every body of an if-statement, loop, etc. must be a
+    <a href="../../Notes/Standards/Structure/component.html#compound">compound statement.</a>
+  </li>
+</ul>
+<p></p>
+
+
+<hr>
+<a name="test"></a>
+<h2>Testing Your Implementation</h2>
+
+<p>You will need to write a test module that uses
+priority queues and demonstrates that your implementation
+is working, at least for the test cases.  Call your
+tester <b>testpq.cpp</b>.
+</p>
+
+<p>Ensure that
+your tester tests every function.
+Try creating more than one priority queue.
+(You will need to use the same types of items and
+priorities for both.)
+</p>
+
+<p>Testing is critical.  Do not turn in an untested module.
+</p>
+
+
+<hr>
+<a name="submit"></a>
+<h2>Submitting Your Work</h2>
+
+<p>To turn in this program, log into one of the Linux computers
+in the lab.  (You can log in remotely.)  Ensure that your files
+are there.  Change to the directory that contains those files.
+Then issue one of the following commands.
+</p>
+
+<dl>
+<dt>First version</dt>
+<dd><p><tt><b>~abrahamsonk/3300/bin/submit 4a pqueue.cpp pqueue.h testpq.cpp</b></tt></p>
+
+</dd><dt>Second version</dt>
+<dd><p><tt><b>~abrahamsonk/3300/bin/submit 4b pqueue.cpp pqueue.h testpq.cpp</b></tt></p>
+</dd></dl>
+
+<hr>
+<a name="late"></a>
+<h2>Late submissions</h2>
+
+<p>Late submissions on version (a) will be accepted for one day after
+the due date.  Late submissions for version (b) will be accepted for
+three days after the due date.  If you miss a late submission deadline
+by a microsecond, your work will not be accepted.
+</p>
+
+
+<p>&nbsp;</p>
+<p>&nbsp;</p>
+<p>&nbsp;</p>
+<p>&nbsp;</p>
+
+
+
+
+</body></html>Ytext/htmlUUTF-8_Hhttp://www.cs.ecu.edu/karl/3300/spr15/assignments/Assignment4/assn4.htmlP°‘_WebResourceResponseOıbplist00‘bcX$versionX$objectsY$archiverT$top Ü†Ø#)*0123IJKLMNOPQRSTUVWXY]U$null›	
+ !"R$6S$10R$2R$7R$3S$11R$8V$classR$4R$9R$0R$5R$1Ä	ÄÄÄ ÄÄÄÄ”$%'(WNS.base[NS.relativeÄ ÄÄ_.http://www.cs.ecu.edu/karl/3300/spr15/3300.css“+,-.Z$classnameX$classesUNSURL¢-/XNSObject#AæÎ	íµŸ≤ »”456?HWNS.keysZNS.objects®789:;<=>Ä	Ä
+ÄÄÄÄÄÄ®@BCDEFGÄÄÄÄÄÄÄÄÄVServer\Content-TypeTEtag]Last-ModifiedTDate]Accept-Ranges^Content-LengthZConnection_Apache/2.2.3 (Red Hat)Xtext/css_"64001-3c8-e9230000"_Fri, 09 Jan 2015 01:16:48 GMT_Sun, 26 May 2030 22:37:28 GMTUbytesS968Uclose“+,Z[_NSMutableDictionary£Z\/\NSDictionary“+,^__NSHTTPURLResponse£`a/_NSHTTPURLResponse]NSURLResponse_NSKeyedArchiver—de_WebResourceResponseÄ    # - 2 7 U [ v y } Ä É Ü ä ç î ó ö ù † £ • ß © ´ ≠ Æ ∞ ≤ ¥ ∂ ∏ ∫ º √ À ◊ Ÿ € ›'-09BDFMU`ikmoqsuwyÇÑÜàäåéêíîõ®≠ª¿Œ›Ë
+!Aagkqvåêù¢∂∫Œ‹ÓÒ             f              	O»h1	{color: black; 
+         text-align: center
+        }
+h2	{color: #0000D0; 
+         text-align: center
+        }
+h3	{color: #0000D0; 
+         text-align: left
+        }
+body	{background-color: white; 
+         color: black; 
+         margin: 15px
+        }
+sub	{font-size: 80%}
+sup	{font-size: 80%}
+dt	{color: #D00000; 
+         font-weight: bold
+        }
+.ccode	{color: #903000; 
+         font-weight: bold
+        }
+.bcode	{color: #FF0000}
+.tab	{background-color: #A0A0FF}
+.term	{color: blue; 
+         font-style: italic
+        }
+.small  {
+         font-size: smaller
+        }
+.write  {color: #D00000}
+
+.red {
+        color: red
+}
+.darkred {
+        color: #D00000
+}
+.th	  {
+  background-color: #C090E8;
+  text-align: center
+}
+A:link    {
+  color: blue;   
+  text-decoration: none
+}
+A:visited {
+  color: #9900FF;   
+  text-decoration: none
+}
+A:active  {
+  color: red;    
+  text-decoration: underline
+}
+A:hover {
+  color: red;
+  text-decoration: underline
+}
+Xtext/css_.http://www.cs.ecu.edu/karl/3300/spr15/3300.css    1 < N d Ç ë ®"ç"ó"ù"Ë"È"Î"Ù#
+'*œ*ÿ                           +	

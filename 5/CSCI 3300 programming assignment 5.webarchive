@@ -1,0 +1,626 @@
+bplist00“_WebMainResource_WebSubresources’	
+_WebResourceData_WebResourceMIMEType_WebResourceTextEncodingName^WebResourceURL_WebResourceFrameNameO?π<html><head>
+  <title> CSCI 3300 programming assignment 5 </title>
+  <link rel="stylesheet" href="../../3300.css" type="text/css">
+<style type="text/css"></style><style></style></head>
+
+<body>
+
+<h1> 
+  Computer Science 3300<br>
+  Spring 2015<br>
+  Section 001<br>
+  Programming Assignment 5
+</h1>
+
+<p></p><div align="center"><table>
+  <tbody><tr>
+    <td><b>Assigned:</b></td>
+    <td>Wednesday, March 4</td>
+  </tr>
+  <tr>
+    <td><b>Intermediate version due:</b></td>
+    <td>Friday, March 20, 11:59pm</td>
+  </tr>
+  <tr>
+    <td><b>Version (a) due:</b></td>
+    <td>Wednesday, March 25, 11:59pm</td>
+  </tr>
+  <tr>
+    <td><b>Version (b) due:</b></td>
+    <td>Saturday, April 11, 11:59pm</td>
+  </tr>
+</tbody></table>
+</div><p></p>
+
+<hr>
+
+<h3>Table of contents</h3>
+
+<p></p><ol>
+  <li><a href="#background">Background</a></li>
+  <li><a href="#requirements">Requirements</a></li>
+  <li><a href="#inputformat">Input format</a></li>
+  <li><a href="#dijkstra">Dijkstra's algorithm</a></li>
+  <li><a href="#info">Information about vertices and graphs</a></li>
+  <li><a href="#inputformat">Intermediate version</a></li>
+  <li><a href="event">Events and the event list</a></li>
+  <li><a href="#pq">Priority queues</a></li>
+  <li><a href="#graph">Graph.cpp</a></li>
+  <li><a href="#trace">Tracing</a></li>
+  <li><a href="#submit">Submitting your work</a></li>
+  <li><a href="#late">Late submissions</a></li>
+</ol><p></p>
+
+
+<hr>
+<a name="background"></a>
+<h2>Background</h2>
+
+<p>A <span class="term">graph</span> is a collection of 
+<span class="term">vertices</span>
+connected by a collection of <span class="term">edges</span>.  
+An edge connects exactly
+two vertices to one another.  You can draw a picture
+of a graph by showing the vertices and the edges connecting them.
+Here is an example.  The vertices are shown as circles with 
+numbers in them and the edges are lines connecting the vertices.
+</p>
+
+<p></p><div align="center">
+  <img src="graph1.gif">
+</div><p></p>
+
+<p>Two vertices are said to
+be <span class="term">adjacent</span> if there is an edge that connects them
+directly to one another.
+In the graph above, vertices 1 and 2 are adjacent, but
+1 and 4 are not adjacent.  A given edge is 
+<span class="term">incident</span> on each of the vertices that
+it connects.
+</p>
+
+<p>A <span class="term">path</span> is a sequence of vertices
+where every consecutive pair of vertices are adjacent to one
+another.
+For example, in the above graph,
+[3, 1, 2, 4] is a path that connects vertices 3 and 4.
+</p>
+
+<p>A graph is <span class="term">connected</span> if there is a path
+from every vertex to every other vertex.
+We will only be concerned with connected graphs here.
+</p>
+
+<p>A <span class="term">weighted graph</span> is a graph in 
+which each edge has a number
+attached to it, called the <span class="term">weight</span> of the edge.
+Here is a picture of a weighted graph.
+</p>
+
+<a name="wgraph"></a>
+<p></p><div align="center">
+  <img src="graph2.gif">
+</div><p></p>
+
+<p>Think of the vertices of a graph as towns and the edges as roads.  
+The weight of an edge is the length of the road.  
+One thing that you might like to know is how to get from one town
+to another by the shortest possible route.  For example, in the
+weighted graph above, the shortest route from vertex 1 to vertex 5 is
+to go from 1 to 3 and then from 3 to 5, and the length of that route is 27.
+You add the weights of the edges that you use.
+</p>
+
+
+<hr>
+<a name="requirements"></a>
+<h2>Requirements</h2>
+
+<h3>Functional requirements</h3>
+
+<p>Write a program that reads information about
+a weighted graph from the
+standard input.  The input format is described in
+detail <a href="#inputformat">below</a>.
+After the description of the graph, the input has two vertex numbers,
+<i>s</i> and <i>t</i>.  
+</p>
+
+<p>Your program should print a description of the
+graph, followed by the shortest 
+path from <i>s</i> to <i>t</i> and the distance from <i>s</i> to <i>t</i> 
+via that path, on the standard output.  
+</p>
+
+<p><a name="example"></a>For example, the input might look
+like this.
+<b></b></p><pre><b>5
+1 2  9.0
+1 3 12.0
+2 4 18.0
+2 3  6.0
+2 5 20.0
+3 5 15.0
+0
+1 5
+</b></pre>
+That says that there are five vertices.  There is an edge from
+vertex 1 to vertex 2 with weight 9.0, an edge from vertex 1 to vertex 3
+with weight 12.0, etc.  The start vertex <i>s</i>
+is 1, and the end vertex <i>t</i> is 5.
+The output for this input would be as follows.
+<b><pre>There are 5 vertices.
+The edges are as follows.
+
+ (1,3) weight 12.000
+ (1,2) weight 9.000
+ (2,5) weight 20.000
+ (2,3) weight 6.000
+ (2,4) weight 18.000
+ (3,5) weight 15.000
+
+The shortest path from 1 to 5 has length 27.000 and is
+1 -&gt; 3 -&gt; 5
+</pre></b>
+<p></p>
+
+
+<h3>Nonfunctional requirements</h3>
+
+<p>This page describes an algorithm, based on Dijkstra's algorithm, for solving 
+this problem, and provides additional details on how to implement it.
+You are required to use this algorithm,
+and to follow the guidelines for its implementation.  It is not
+acceptable to rely on a different approach to the problem.
+</p>
+
+<p>Use sensible terminology in your program.  If something
+is a graph, do not call it an edge.  If something is an edge, do not call it a
+vertex.  Make variable and type names sensible.  Keep functions short and simple.
+</p>
+
+<p>As always, you must follow the
+<a href="../../Notes/Standards/index.html">coding standards</a>
+for this course.
+</p>
+
+
+<hr>
+<a name="inputformat"></a>
+<h2>Input Format</h2>
+
+<p>The input starts with a line that tells how many vertices
+the graph has.  If there are five vertices, then those vertices
+have numbers 1, 2, 3, 4 and 5.  In general, if there are <i>n</i> 
+vertices, then they are numbered 1, ‚Ä¶, <i>n</i>.
+</p>
+
+<p>Following the first line are
+the edges, one per line.  Each edge line has two integers and one
+real number on it.
+Line
+<b></b></p><pre><b>2 4 5.4
+</b></pre>
+indicates that there is an edge between vertices 2 and 4,
+and that its weight is 5.4.  The end of the list of edges is signaled
+by a line that contains just a 0.  After that are the numbers
+for vertices <i>s</i> and <i>t</i>.  An input describing graph 
+<p></p>
+
+<p></p><div align="center">
+  <img src="graph2.gif">
+</div><p></p>
+
+<p>with start vertex 2 and end vertex 4 might look like this.
+<b></b></p><pre><b>5
+1 2  9.0
+1 3 12.0
+2 4 18.0
+2 3  6.0
+2 5 20.0
+3 5 15.0
+0
+2 4
+</b></pre>
+<p></p>
+
+<p><b>Important note.</b> The first number in the input is the number
+of <i>vertices</i>, not the number of <i>edges</i>.  Do not use that
+number to determine how many remaining lines need to be read.  Just 
+keep reading edges until you read a 0.
+</p>
+
+
+<hr>
+<a name="dijkstra"></a>
+<h2>Dijkstra's Algorithm</h2>
+
+<p>Imagine yourself at the start vertex.  You send out a
+signal from there along each edge, 
+where the signal takes <i>w</i> seconds
+to traverse an edge of weight <i>w</i>.  For example,
+if the start vertex is vertex 1 and there is an edge between
+vertices 1 and 2 of weight 5.1, then the signal sent from
+vertex 1 reaches vertex 2 after 5.1 seconds.
+</p>
+
+<p>The <i>first</i> time a signal reaches a vertex <i>v</i>,
+you record the time at which the signal arrived and which vertex the
+signal arrived from.  Then you send a signal out on
+all of the edges that are incident on vertex <i>v</i>
+and whose other vertex has not yet received a signal.
+</p>
+
+<p>The second and subsequent times a signal arrives
+at a vertex, the signal is ignored.
+</p>
+
+<p>The algorithm is finished when a signal reaches the end
+vertex.  The time at which the signal arrived at the end
+vertex is the distance from the start vertex to the
+end vertex.
+</p>
+
+<p>Suppose that signaler(<i>u</i>) is the number of the
+vertex from which the first signal reached vertex <i>u</i>.
+Then path
+[<i>u</i>, signaler(<i>u</i>), signaler(signaler(<i>u</i>)), ...]
+is the shortest path from <i>u</i> back to the start vertex.
+</p>
+
+
+<h3>Discrete event simulation</h3>
+
+<p>This program must simulate sending and receiving signals.
+It keeps a list of
+<span class="term">events</span>, where an event holds
+three pieces of information, (<i>u</i>, <i>v</i>, <i>t</i>),
+and indicates the arrival of a signal at vertex <i>v</i> 
+at time <i>t</i>, where the signal was sent from vertex <i>u</i>.
+</p>
+
+<p>The idea is to store the events in increasing order by 
+the times at which they occur.  The program repetitively
+performs the following steps.
+</p>
+<ol>
+  <li><p>
+    Get the next event (<i>u</i>, <i>v</i>, <i>t</i>).
+    The next event is the one that occurs next in chronological order.
+    So it is the one with the smallest time.
+  </p></li>
+
+  <li><p>
+    If no signal has yet arrived at vertex <i>v</i>, then
+    do the following.
+    </p>
+    <ol type="a">
+      <li><p>
+        Record signaler(<i>v</i>) = <i>u</i> and
+        distance(<i>v</i>) = <i>t</i>.
+      </p></li>
+      <li><p>
+        For each edge that is incident on vertex <i>v</i>
+        (say, connecting <i>v</i> with vertex <i>x</i>
+        and having weight <i>w</i>), schedule a new event
+        (<i>v</i>, <i>x</i>, <i>t</i>+<i>w</i>) indicating
+        that a signal will arrive at vertex <i>x</i>, coming from
+        vertex <i>v</i>, at a time that is <i>w</i> seconds 
+        after time <i>t</i>.  That simulates sending a signal
+        from <i>v</i> to <i>x</i>.
+      </p></li>
+    </ol>
+  <p></p></li>
+</ol>
+
+<h3>Getting started</h3>
+
+<p>To get going, set the signaler of each vertex to ‚àí1 to
+indicate that no signal has yet arrived at that vertex.
+Then create an initial event (0, <i>s</i>, 0.0)
+that indicates a signal arriving at the start vertex <i>s</i> at time
+0.0, coming from a fictitious vertex 0.  Then do the simulation
+of events.
+</p>
+
+<h3>Getting the final answer</h3>
+
+<p>When the simulation is finished, you will be able to follow a path
+from <i>t</i> back to <i>s</i> by following the chain of signalers.
+<b></b></p><pre><b>     <i>t</i> -----&gt; signaler(<i>t</i>) -------&gt; signaler(signaler(<i>t</i>)) ----&gt; ... -----&gt; <i>s</i>
+</b></pre>
+Print that chain out <i>backwards</i>, so that it goes from <i>s</i>
+to <i>t</i> instead of from <i>t</i> to <i>s</i>.  
+The easiest way to do that is
+to use recursion.  To print a path backwards, starting at vertex <i>u</i>,
+print the path starting at signaler(<i>u</i>) backwards, then print <i>u</i>.
+Of course, in the special case where <i>u</i> is the start vertex
+<i>s</i>, just print <i>s</i>.  Remember to put <tt>-&gt;</tt> between
+vertex numbers.
+<p></p>
+
+<hr>
+<a name="info"></a>
+<h2>Information about Vertices and Graphs</h2>
+
+<p>You will need to store some information for each vertex in
+the graph.  Create a structure type that holds information about
+a vertex.
+</p>
+
+<ol>
+ <li><p>
+   Each vertex has a <i>distance</i> from the start vertex.
+ </p></li>
+
+ <li><p>
+   Each vertex <i>v</i> has a <i>signaler</i>.
+ </p></li>
+
+ <li><p>
+   Each vertex has a linked list of edge descriptions, telling
+   the vertices that are adjacent to this vertex and the weight of
+   the edge that connects them.
+   So each cell in the linked list holds (1) another vertex number
+   and (2) a weight.  
+   (This list is called the <span class="term">adjacency list</span>
+   of this vertex.)
+ </p></li>
+</ol>
+
+<p>Create a type that holds information about a graph.  It should
+hold (1) the number of vertices, (2) the start vertex (an integer),
+(3) the end vertex and (4) an array holding a structure for each vertex.
+Provide a constructor that takes an integer parameter <i>n</i> and
+sets up the information for a graph with <i>n</i> vertices and no
+edges.  Be sure that the information about each vertex is initialized.
+</p>
+
+<p>It is convenient to find the information about vertex <i>v</i>
+in graph <i>g</i> to be <i>g</i>.info[<i>v</i>], assuming the array
+is called info.  But remember that the vertices are numbered starting
+at 1, so you want to use <i>g</i>.info[1], ..., g.info[<i>n</i>].
+That means there are <i>n</i>+1 slots in the array.  You do not
+use <i>g</i>.info[0].
+</p>
+
+
+<hr>
+<a name="intermediate"></a>
+<h2>Intermediate version</h2>
+
+<p>Once the readGraph and printGraph functions are
+working, submit them as assignment 5i.  Include a
+main function that tests them.
+</p>
+
+
+<hr>
+<a name="event"></a>
+<h2>Events and the Event List</h2>
+
+<p>Create a type Event that describes an event.  As explained
+above, it holds two vertex numbers and a time.  Put the
+definition of type Event in file <b>event.h</b>.  You
+will want to have it in more than one place.  To avoid
+the compiler reading the definition of type Event twice,
+write the body of file event.h as follows.
+</p><pre class="ccode">#ifndef EVENT_H
+#define EVENT_H
+
+struct Event
+{
+  ‚Ä¶
+};
+
+#endif
+</pre>
+This says that if
+<a href="../../Notes/C/preprocessor.html">preprocessor</a> symbol
+EVENT_H has not yet been defined, then define it and put the
+definition of type Event in the program.  But if EVENT_H has
+already been defined, then omit the (redundant) definition
+of type Event.
+<p></p>
+
+
+<hr>
+<a name="pq"></a>
+<h2>Priority Queues</h2>
+
+<p>You will need a data structure to hold the events that
+have been scheduled.  If you think about the requirements
+of such a data structure, you will see that you require the
+following.
+</p>
+
+<ol>
+  <li><p>
+    A way to create an initialized event queue with no events
+    in it.
+  </p></li>
+
+  <li><p>
+    A way to insert a new event into the event queue, with
+    a given time.
+  </p></li>
+
+  <li><p>
+    A way to remove the event that has the smallest time.
+  </p></li>
+
+  <li><p>
+    A way to ask whether there are any events in the event queue.
+  </p></li>
+</ol>
+
+<p>Those features are just what you have already implemented
+as a <span class="term">priority queue</span>.  Just use
+that module.  You will need to change the definition of
+PQItemType to be Event.  You will need to make pqueue.h
+include a header file that defines type Event.
+</p>
+
+<p>Ensure that your algorithm only uses features of the priority
+queue module that are part of its interface.  Do not use
+features that should remain hidden inside the priority queue
+module!  You will lose a lot of points if you use non-exported
+features of the priority queue module.
+</p>
+
+<hr>
+<a name="graph"></a>
+<h2>Graph.cpp</h2>
+
+<p>Create a module, <b>graph.cpp</b>,
+that is responsible for reading and writing graphs and performing
+the shortest path algorithm.
+Put the vertex and graph type definitions in it.  Include a
+main function that reads and echoes the information in the
+standard input, performs the simulation
+and writes the path and its distance to the standard output.
+</p>
+
+<p>Provide functions to do the following tasks.
+</p>
+
+<hr>
+<a name="trace"></a>
+<h2>Tracing</h2>
+
+<p>You are required to put trace (or debug) prints in your program
+that can be turned on and off.  If tracing is turned on, trace the action
+of Dijkstra's algorithm by doing the following.  Any time
+the program shows a signal it must show signaler, the receiver and the
+arrival time.
+</p>
+
+<ol>
+  <li>Show the sending of a signal.</li>
+  <li>Show the arrival of a signal.</li>
+  <li>Show updates when the first signal arrives at a vertex.</li>
+</ol>
+
+<p>The program should look at the command line.  If it contains
+<b>-t</b>, then tracing should be turned on.  If not, tracing
+should be turned off.
+</p>
+
+<hr>
+<a name="submit"></a>
+<h2>Submitting Your Work</h2>
+
+<p>To turn in this program, log into one of the Linux computers
+in the lab.  (You can log in remotely.)  Ensure that your files
+are there.  Change to the directory that contains those files.
+Then issue one of the following commands.
+</p>
+
+<dl>
+<dt>Intermediate version</dt>
+<dd><p><tt><b>~abrahamsonk/3300/bin/submit 5i graph.cpp</b></tt></p>
+
+</dd><dt>First version</dt>
+<dd><p><tt><b>~abrahamsonk/3300/bin/submit 5a graph.cpp event.h pqueue.cpp pqueue.h</b></tt></p>
+
+</dd><dt>Second version</dt>
+<dd><p><tt><b>~abrahamsonk/3300/bin/submit 5b graph.cpp event.h pqueue.cpp pqueue.h</b></tt></p>
+</dd></dl>
+
+<hr>
+<a name="late"></a>
+<h2>Late submissions</h2>
+
+<p>Late submissions on version (a) will be accepted for one day after
+the due date.  Late submissions for version (b) will be accepted for
+three days after the due date.  If you miss a late submission deadline
+by a microsecond, your work will not be accepted.
+</p>
+
+
+<p>&nbsp;</p>
+<p>&nbsp;</p>
+<p>&nbsp;</p>
+<p>&nbsp;</p>
+
+
+
+
+</body></html>Ytext/htmlUUTF-8_Hhttp://www.cs.ecu.edu/karl/3300/spr15/assignments/Assignment5/assn5.htmlP£‘_WebResourceResponseOıbplist00‘bcX$versionX$objectsY$archiverT$top Ü†Ø#)*0123IJKLMNOPQRSTUVWXY]U$null›	
+ !"R$6S$10R$2R$7R$3S$11R$8V$classR$4R$9R$0R$5R$1Ä	ÄÄÄ ÄÄÄÄ”$%'(WNS.base[NS.relativeÄ ÄÄ_.http://www.cs.ecu.edu/karl/3300/spr15/3300.css“+,-.Z$classnameX$classesUNSURL¢-/XNSObject#AæÎ	ùñ õ »”456?HWNS.keysZNS.objects®789:;<=>Ä	Ä
+ÄÄÄÄÄÄ®@BCDEFGÄÄÄÄÄÄÄÄÄVServer\Content-TypeTEtag]Last-ModifiedTDate]Accept-Ranges^Content-LengthZConnection_Apache/2.2.3 (Red Hat)Xtext/css_"64001-3c8-e9230000"_Fri, 09 Jan 2015 01:16:48 GMT_Sun, 26 May 2030 22:37:28 GMTUbytesS968Uclose“+,Z[_NSMutableDictionary£Z\/\NSDictionary“+,^__NSHTTPURLResponse£`a/_NSHTTPURLResponse]NSURLResponse_NSKeyedArchiver—de_WebResourceResponseÄ    # - 2 7 U [ v y } Ä É Ü ä ç î ó ö ù † £ • ß © ´ ≠ Æ ∞ ≤ ¥ ∂ ∏ ∫ º √ À ◊ Ÿ € ›'-09BDFMU`ikmoqsuwyÇÑÜàäåéêíîõ®≠ª¿Œ›Ë
+!Aagkqvåêù¢∂∫Œ‹ÓÒ             f              	O»h1	{color: black; 
+         text-align: center
+        }
+h2	{color: #0000D0; 
+         text-align: center
+        }
+h3	{color: #0000D0; 
+         text-align: left
+        }
+body	{background-color: white; 
+         color: black; 
+         margin: 15px
+        }
+sub	{font-size: 80%}
+sup	{font-size: 80%}
+dt	{color: #D00000; 
+         font-weight: bold
+        }
+.ccode	{color: #903000; 
+         font-weight: bold
+        }
+.bcode	{color: #FF0000}
+.tab	{background-color: #A0A0FF}
+.term	{color: blue; 
+         font-style: italic
+        }
+.small  {
+         font-size: smaller
+        }
+.write  {color: #D00000}
+
+.red {
+        color: red
+}
+.darkred {
+        color: #D00000
+}
+.th	  {
+  background-color: #C090E8;
+  text-align: center
+}
+A:link    {
+  color: blue;   
+  text-decoration: none
+}
+A:visited {
+  color: #9900FF;   
+  text-decoration: none
+}
+A:active  {
+  color: red;    
+  text-decoration: underline
+}
+A:hover {
+  color: red;
+  text-decoration: underline
+}
+Xtext/css_.http://www.cs.ecu.edu/karl/3300/spr15/3300.css‘Obplist00‘bcX$versionX$objectsY$archiverT$top Ü†Ø#)*0123IJKLMNOPQRSTUVWXY]U$null›	
+ !"R$6S$10R$2R$7R$3S$11R$8V$classR$4R$9R$0R$5R$1Ä	ÄÄÄ ÄÄÄÄ”$%'(WNS.base[NS.relativeÄ ÄÄ_Hhttp://www.cs.ecu.edu/karl/3300/spr15/assignments/Assignment5/graph1.gif“+,-.Z$classnameX$classesUNSURL¢-/XNSObject#AæÎ	ùñŸ8 »”456?HWNS.keysZNS.objects®789:;<=>Ä	Ä
+ÄÄÄÄÄÄ®@BCDEFGÄÄÄÄÄÄÄÄÄVServer\Content-TypeTEtag]Last-ModifiedTDate]Accept-Ranges^Content-LengthZConnection_Apache/2.2.3 (Red Hat)Yimage/gif_"645cd-4ba-413f2880"_Tue, 23 Dec 2014 17:10:42 GMT_Mon, 27 May 2030 09:45:56 GMTUbytesT1210Uclose“+,Z[_NSMutableDictionary£Z\/\NSDictionary“+,^__NSHTTPURLResponse£`a/_NSHTTPURLResponse]NSURLResponse_NSKeyedArchiver—de_WebResourceResponseÄ    # - 2 7 U [ v y } Ä É Ü ä ç î ó ö ù † £ • ß © ´ ≠ Æ ∞ ≤ ¥ ∂ ∏ ∫ º √ À ◊ Ÿ € ›(-8AGJS\^`gozÉÖáâãçèëìúû†¢§¶®™¨Æµ¬«’⁄Ë˜%<\|Çáçí®¨πæ“÷Í¯
+#             f              %O∫GIF87aS∆ Ä     ˇˇˇ!˘     ,    S∆ @ˇåè©ÀÌ£ú¥⁄ã≥ﬁº˚Ü‚HñÊâ¶Í ∂Ó«`—Ú ˆ§„~∏[CYA;*î?Û|Êö>ùıäÕB§“wK=uµ≥∞ô“ã§œHk{Õˆ‡ç^7éœÓzˇÚ◊'8(D∏(Çh∏x¶ÿÁ»…8˘"˘cyI©iÜπ)—˘)äÍ4⁄Qz™Zì∫ ‡˙*+{Ck;ãõª◊˚ï¡å2LC∂t¸iiº\V˝,¯%˝‡L=ÖÌ¶¶˝h˙-(Œ‹˝ñ]ÆæŒﬁÓ˛/?O_oèüØøœ/~’–∂8Õ¥ÖJGLâç'¡‹í%¢ƒâ+Zºxî∑Ä'◊»QÅ‘#*éÍBÊIeí§HÉûTKŸÊ4óØdé∞)åÊ)ú9kÍŸ§ƒ”!Àü∫™ÿJtf
+§öò&ùS¬i.©.>%uµ%è¨7ˇ9«5⁄÷maG*}ò4–™Ê0RDÀáÌ,r„,ÀÕ+ﬁΩ|˚˙˝8∞‡¡Ñ>å8±‚≈å;~y)ÿ¢hﬂÈù3˘™"π ˝" $…Ydï≈[õYô #QJ∑:⁄gÖ1Ä‹⁄ñ®«öÈ[ÆU'‘∏ëÊfN~®°Ãz˘2¡∏u«Õ&πë› ëDg”\´¿ÎM≤ãY ›Ë3òﬁó7ã„¸`ıâá◊>∑⁄{ÃÄŒ7¡ﬁw¸˚·(€ £ˇ‘y r0†NúÿXe"Ç Ò‰ |
+¬Ê\?ﬁ”–Ö›Mÿ[Çr»
+~iËŒqÑëX“gä°¯ç#,˛«ﬂ/ˆb(3ûï77NE ^°•fd=ßŸX±¶Vp?È]®‹%F™∏≤cz2÷Iï™»‹àbéIfôfûâföjÆ…fõnæ	gúrŒIgùvﬁâgûzÓ…gü~˛	h†ÇñêÿÅUù]âÜÂ%,Ÿ5*Ññ≥°∆h“µ7¶¬Qwd%≈á^U—…‡ß/mGíBÖ»[¥ùZì±ñ´§uH¨FÓ÷Hîæ.Ëd∞V‚‰/à†%<w€È™0Ó⁄l>ùm)lµ∆*I,?√Ö±ÏoWäöm´ñfj*£Ü^äF9òH∫$ÖÍÀ.Wã™˚…Ínä=‚k-Ω®Ú[¨øâ ú´¿$ƒögÙåp¡‚€péûÚ€pPœzµÅJ ÷≈⁄>ã›∆≤·¯Áã˘yå·(¢LèÜ≤‹`S*ÔπÚ*0[∂àñ7≥sr∆v™ÒŒœá*ùèÍ+g«%Œ)ï–˙π…î”ºÆi1>R_{´¥Pøfaõ)]≠Èô!Å]ÆôëΩØÿ≈ á¶1hãhˆ¡}Ω=	-t„G&ïÎçY ›«òˆa~ÁV∂yNÎÿ‡çŸµÆònxê:å$p◊µf˘^;`QÔÊí^÷‰ë~ÓÍπMπƒè….G°lÎbÕ{ªôO-xÍ—>—Zâ«äÌ¶–‚ŒàØ∆ODW^æ8≤«+v·~õXﬂÚR_=ËÃkˇ{Ùl˜4_òÅâæÙèp*^}f¥Ã~˚Óø¸ÚœO˝ˆﬂè˛˙Ôœˇ˛ˇ¿ 
+pÄ,‡ú
+  ;Yimage/gif_Hhttp://www.cs.ecu.edu/karl/3300/spr15/assignments/Assignment5/graph1.gif‘Obplist00‘bcX$versionX$objectsY$archiverT$top Ü†Ø#)*0123IJKLMNOPQRSTUVWXY]U$null›	
+ !"R$6S$10R$2R$7R$3S$11R$8V$classR$4R$9R$0R$5R$1Ä	ÄÄÄ ÄÄÄÄ”$%'(WNS.base[NS.relativeÄ ÄÄ_Hhttp://www.cs.ecu.edu/karl/3300/spr15/assignments/Assignment5/graph2.gif“+,-.Z$classnameX$classesUNSURL¢-/XNSObject#AæÎ	ùñ„÷ »”456?HWNS.keysZNS.objects®789:;<=>Ä	Ä
+ÄÄÄÄÄÄ®@BCDEFGÄÄÄÄÄÄÄÄÄVServer\Content-TypeTEtag]Last-ModifiedTDate]Accept-Ranges^Content-LengthZConnection_Apache/2.2.3 (Red Hat)Yimage/gif_"645ce-586-413f2880"_Tue, 23 Dec 2014 17:10:42 GMT_Mon, 27 May 2030 09:45:56 GMTUbytesT1414Uclose“+,Z[_NSMutableDictionary£Z\/\NSDictionary“+,^__NSHTTPURLResponse£`a/_NSHTTPURLResponse]NSURLResponse_NSKeyedArchiver—de_WebResourceResponseÄ    # - 2 7 U [ v y } Ä É Ü ä ç î ó ö ù † £ • ß © ´ ≠ Æ ∞ ≤ ¥ ∂ ∏ ∫ º √ À ◊ Ÿ € ›(-8AGJS\^`gozÉÖáâãçèëìúû†¢§¶®™¨Æµ¬«’⁄Ë˜%<\|Çáçí®¨πæ“÷Í¯
+#             f              %OÜGIF87ac◊ Ä     ˇˇˇ!˘     ,    c◊ @ˇåè©ÀÌ£ú¥⁄ã≥ﬁº˚Ü‚HñÊâ¶Í ∂Ó«ÚLàMÁüç}”	u¡Eı;Œ Ã`S9t6áhïJ±!Z¨¶ú>¿^·19.;¥]≤:+!ªﬂππèó€Òñ˝÷œ(∏8Qxe®∏ËÅ∏Ëà…8I'Yf)ÇIππƒπ≈®È)zòXJàvÄ:JŸ ¡‰z;k◊yR´€{ßR∏Íõ6\L8¬kßÃÃu‹\	-˝K:≠(´g˝ıD¨mZ˝-√v#˛ıîÆæŒﬁÓÓ™ô<>)?ø3'{øÏƒˇêÜ0{<à0°¬Ö:|1¢ƒâ+Zºà\òå+ÊXuº&fñ*ké„ˆâÅ…ŒZ€”Üñªô4’·)N¢ïuXrÙ2å”æb<oÆÈ¶Úg¿¢fR0UöÍ$®“ûñ∞⁄á*—IX3≈¢ñRk$#Á‘tuqVlá¥`˘±U[Å©ù∑π‡j¨°ïÆ]èçˆ&ı[w‡∏ÉØ∂Ω¢aΩ¬dqycúsMŸ¡Ò ;˛b˘±‰ÃúÌ
+€9¥Ë—§Kõ>ç:µÍ’¨[ª~;∂ÏŸ¥k€Üó ÈÌü3~N¨8®@®øu∫‰s‹–<J≠†Öö$‡è˛:ø&uØèqÓ´πÓxc„öUÇ?è>Ω˙vó7O‹Y›}d]m“ïüm”»™kw›G	™õr@¬ÉF}ÁìÅXlåa
+F1ÕJŒ6!XU¯Ü—5ı o∑L®!j!ä««à£ô® ä)f∞Jo¢-ÁbnÒâ¥aå°)”)R	∆◊a/ ÿû*ˆ◊°ÖQ!X$ëÅ-ï‰Üh—ÛQ3C◊ÇCM©dìì!Ûåè¸iy__ja˘ﬁ.åë˘–t7Ç%aß°ô–\ÆŸóõps“πbkï&'hoÜ˘WfœyŸ#ü›mπW>à‚∑ûÅ aY}À…w¢ëúYÁKN˛Hm5Èùü≤IÍÅÑñö·|®Æ j´Æ»æ
+k¨≤ŒJk≠∂ﬁäkÆ∫Ó kØæ˛
+l∞¬Kl±∆ãl≤ .ÀlUv^cõ¬⁄XQq∆RKë°;E¶GÇ5bÄ£ä"Ó≥HH˚üπóDâ·∂FdÍnä<çKévﬁ.ò’+cëƒ"GŒ]7cß“eô≠uîÍÿÂéGÑc°„ëgâΩ‰x™üiæÎhû´äÓánrLD£ÎÌÀ1äÏ1èUåÏ÷¶%J¨±/ä.⁄–~ÿ°§¬8?\«Á´L(˜ˆ®!6KπpsÍÍÙó˝Œ6[±≈Œ5¥iÙj£m÷C5“_qÕ3÷ñÇΩ53∞TÕ)ø&†›€0s∂€ √µ‹1W…µ›{ÿ¨ﬁoÈÌôÃ¯.À6ÉÄÁeKª…ﬁ.≤BW,ödÓ‡“µa˘∏¿ø`+hùÒÓç(ãÖu¯ Í›∆4íÃy§ 7Æ©œ§ãË‹SMûW∑}∑ÌKÍ‹d˜°ÿº&Vz—≤“ï<Õ±≤’<îπû}”¥^ò˚ÁÇ€˙‘Ã]ß|˝ìÑY˚¨í,µŸÊ7¯Ù˜€√*œt‰„Õˇ⁄bUœŸâ∫ä
+˛1¯Ø61ÄNKÿôV5∫5ëjO§! §˜'0%g5Y”kºwAÌ»Rz*[Œ»äOÈ∆Å°kﬂâÚA¬ó≠Ãr)$”ó∂⁄ΩÕ/ÉÇ°;∑BﬁpL/îag:rAá-,û)4˙ÆD"k¢MívÉ˘Q|G$êßEÙ0AV†Î∏ÿE~Òk‘¢Õx¡ YÖ˛yblFµ;≤=œs:îcú@ÉE;&lxzdÿ˚hkR"Z§!â»D*rëål§#	…HJríî¨§%/â…L.´  ;_Hhttp://www.cs.ecu.edu/karl/3300/spr15/assignments/Assignment5/graph2.gif    1 < N d Ç ë ®@e@o@u@¿@¡@≈@Œ@‰D›H©H≤H„HÏMQøQ…RRV2[º                           \
