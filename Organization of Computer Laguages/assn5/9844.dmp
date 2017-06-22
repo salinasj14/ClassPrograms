@@ -1,0 +1,147 @@
+Thu Nov 10 13:11:30 2016
+File /home/INTRA/salinasj14/comlang/assn5/sequent
+
+
+Trapped exception noMatchCaseX("[|-([\\/(vbl(\"P\"),vbl(\"Q\"))],[vbl(\"T\") & (lazy cmg.-/)]),|-([\\/(vbl(\"P\"),vbl(\"Q\"))],[vbl(\"Y\") & (lazy cmg.-/)])]")
+
+--There was no successful case in a choose-matching, loop-matching,
+  definition by cases or function application.  Sometimes this
+  occurs because the target of a match fails.
+
+
+Instruction that caused the trap: FAIL
+Instruction argument(s) [Internal form]:
+{(91,"|-"++"(["++"\/"++"(vbl"++"(""++(80,34,41,",vbl"++"(""++(81,34,41,41,93,",["++"vbl"++"(""++(84,34,41," & "++"(lazy cmg.-/)"++(93,41,44,"|-"++"(["++"\/"++"(vbl"++"(""++(80,34,41,",vbl"++"(""++(81,34,41,41,93,",["++"vbl"++"(""++(89,34,41," & "++"(lazy cmg.-/)"++(93,41,93,0))))))))):18}
+
+
+  ------------------------------------------------------
+ |Note: the computation has used optimizations that     |
+ |might result in losses of stack frames and losses of  |
+ |identifier bindings in what follows.  To avoid losing |
+ |information, rerun with option -t on the command line.|
+  ------------------------------------------------------
+
+
+======================================================
+              Configuration
+======================================================
+
+ For each thread the run-time stack is shown deepest level first.
+ Each frame shows the function, the package where the function
+ is defined, and the line number in that package.  The values of
+ bound names are shown in each frame.
+
+======================================================
+          Active Thread 20  (group 20)
+======================================================
+  thread name = "Execute-@sequent-1"
+  group name  = "Execute-@sequent-1"
+  Running Execute
+  Running
+======================================================
+
+    Function             Package               Line
+    --------             -------               ----
+  3.allValid?            sequent                228
+    Param type:  [Sequent]
+    Result type: Boolean
+
+    -----------------------------------------------
+  2.allSatisfy           StandardAnyCollectionImp   113
+    Param type:  [Sequent]
+    Result type: Boolean
+
+    xs: [Sequent]
+      = []
+    f: (Sequent -> Boolean)
+      = (function allValid?: (Sequent.Sequent -> Cmg.Boolean))
+    -----------------------------------------------
+  1.Execute-@sequent-1   sequent                275
+    Result type: ()
+
+    t: Sequent
+      = |-([vbl("")],[==>(vbl("P"),vbl("J"))])
+    u: Sequent
+      = |-([vbl("P"),vbl("Q")],[vbl("Q")])
+    us: Sequent
+      = |-([\/(vbl("P"),vbl("Q"))],[\/(vbl("Q"),vbl("P"))])
+    paco: Sequent
+      = |-([vbl("P"),vbl("Q")],[vbl("")])
+    mary: Sequent
+      = |-([vbl("")],[vbl("P"),vbl("Q")])
+    sh: Formula
+      = \/(vbl("P"),neg(vbl("P")))
+    shh: Formula
+      = /\(vbl("P"),neg(vbl("P")))
+    i: Formula
+      = ==>(/\(vbl("P"),vbl("Q")),\/(vbl("Q"),vbl("P")))
+    -----------------------------------------------
+
+======================================================
+Nonshared box contents for preceding activation (Unlisted are empty):
+======================================================
+
+  (cmg.precisionBx)
+       1 : Integer
+          = 15
+  (cmg.stdoutBx)
+       2 : Outfile of (Char)
+          = (stdout)
+  (cmg.stderrBx)
+       3 : Outfile of (Char)
+          = (stderr)
+  (cmg.cwdBx)
+       5 : String
+          = "/home/INTRA/salinasj14/comlang/assn5"
+
+       6 : Boolean
+          = false
+
+======================================================
+                  Shared box contents
+======================================================
+
+       8 : Boolean
+          = true
+      10 : String
+          = (stdin)
+      12 : [(String -> (Any, String))]
+          = [(function wrapGetter: (String -> (Cmg.Any, String))),(function wrapGetter: (String -> (Cmg.Any, String))),(function wrapGetter: (String -> (Cmg.Any, String))),(function wrapGetter: (String -> (Cmg.Any, String))),(function wrapGetter: (String -> (Cmg.Any, String))),(function wrapGetter: (String -> (Cmg.Any, String))),(function wrapGetter: (String -> (Cmg.Any, String))),(function wrapGetter: (String -> (Cmg.Any, String))),(function wrapGetter: (String -> (Cmg.Any, String))),(function wrapGetter: ...
+
+======================================================
+            Non-function Globals
+======================================================
+
+cmg.bvNull
+  : Bitvec
+  = 0
+cmg.commandLine
+  : [String]
+  = []
+cmg.getWrappedBox
+  : [:[(String -> (Any, String))]:]
+  = (shared box 12)
+cmg.largest
+  : Char
+  = '\{255}'
+cmg.letters
+  : {Char}
+  = {'A','B','C','D','E','F','G','H','I','J','K','L','M','N','O','P','Q','R','S','T','U','V','W','X','Y','Z','a','b','c','d','e','f','g','h','i','j','k','l','m','n','o','p','q','r','s','t','u','v','w','x','y','z'}
+cmg.lowerCaseLetters
+  : {Char}
+  = {'a','b','c','d','e','f','g','h','i','j','k','l','m','n','o','p','q','r','s','t','u','v','w','x','y','z'}
+cmg.showCharsQuotedBx
+  : [:Boolean:]
+  = (shared box 8)
+cmg.showIntrinsicBx
+  : [:Boolean:]
+  = (nonshared box 6)
+cmg.upperCaseLetters
+  : {Char}
+  = {'A','B','C','D','E','F','G','H','I','J','K','L','M','N','O','P','Q','R','S','T','U','V','W','X','Y','Z'}
+cmg.whiteSpaceDenseSet
+  : DenseSet of (Char)
+  = {'\t','\n','\r',' '}
+cmg.whiteSpaceSet
+  : {Char}
+  = {'\t','\n','\r',' '}

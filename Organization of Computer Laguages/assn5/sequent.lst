@@ -1,0 +1,590 @@
+Thu Nov 10 17:19:59 2016
+ECU Cinnameg, version 9.0.5 (byte code version 73)
+File /home/INTRA/salinasj14/comlang/assn5/sequent.cmg
+
+
+   1 %% Name: Jose Salinas
+   2 %% Date: 11/02/2016
+   3 %% Tabs: 2
+   4 Package sequent
+   5 
+   6 =============================================
+   7                   export
+   8 =============================================
+   9 
+  10 =============================================
+  11 %%             Binary operators
+  12 =============================================
+  13 
+  14 Operator 
+  15   |-  (++);
+  16   \/  (+);
+  17   /\  (*);
+  18   ==> (opL5)
+  19 %Operator
+  20 
+  21 =============================================
+  22 %%             Formula
+  23 =============================================
+  24 
+  25 Type Formula =
+  26     vbl String
+  27   | neg Formula
+  28   | Formula /\ Formula
+  29   | Formula \/ Formula
+  30   | Formula ==> Formula
+  31 with
+  32   $, show, ==
+  33 %Type
+
+--> public type Sequent.Formula
+
+--> Relate Sequent.Formula belongsTo Cmg.AnyEq
+
+--> cmg.$
+              : (Formula -> String)
+              Define {--public--}
+
+--> cmg.==
+              : ((Formula, Formula) -> Boolean)
+              Define {--public--}
+
+--> cmg.show
+              : (Formula -> String)
+              Define {--public--}
+
+--> sequent./\
+              : ((Formula, Formula) -> Formula)
+              Pattern {--public--}
+
+--> sequent./\
+              : ((Formula, Formula) -> Formula)
+              Define {--public--}
+
+--> sequent./\/-
+              : (Formula -> (Formula, Formula))
+              Define {--public--}
+
+--> sequent./\?
+              : (Formula -> Boolean)
+              Define {--public--}
+
+--> sequent.==>
+              : ((Formula, Formula) -> Formula)
+              Pattern {--public--}
+
+--> sequent.==>
+              : ((Formula, Formula) -> Formula)
+              Define {--public--}
+
+--> sequent.==>/-
+              : (Formula -> (Formula, Formula))
+              Define {--public--}
+
+--> sequent.==>?
+              : (Formula -> Boolean)
+              Define {--public--}
+
+--> sequent.neg
+              : (Formula -> Formula)
+              Pattern {--public--}
+
+--> sequent.neg
+              : (Formula -> Formula)
+              Define {--public--}
+
+--> sequent.neg?
+              : (Formula -> Boolean)
+              Define {--public--}
+
+--> sequent.unneg
+              : (Formula -> Formula)
+              Define {--public--}
+
+--> sequent.unvbl
+              : (Formula -> String)
+              Define {--public--}
+
+--> sequent.vbl
+              : (String -> Formula)
+              Pattern {--public--}
+
+--> sequent.vbl
+              : (String -> Formula)
+              Define {--public--}
+
+--> sequent.vbl?
+              : (Formula -> Boolean)
+              Define {--public--}
+
+  34 
+  35 Abbrev
+  36   MaybeSequents = Maybe of [Sequent];
+  37   FormulaTester = Formula -> Boolean;
+  38   Rule          = Sequent -> MaybeSequents
+  39 %Abbrev
+  40 
+  41 =============================================
+  42 %%             Sequent
+  43 =============================================
+  44 
+  45 Type Sequent =
+  46   [Formula] |- [Formula]
+  47 with
+  48   $, show, ==
+  49 %Type
+
+--> public type Sequent.Sequent
+
+--> Relate Sequent.Sequent belongsTo Cmg.AnyEq
+
+--> cmg.$
+              : (Sequent -> String)
+              Define {--public--}
+
+--> cmg.==
+              : ((Sequent, Sequent) -> Boolean)
+              Define {--public--}
+
+--> cmg.show
+              : (Sequent -> String)
+              Define {--public--}
+
+--> sequent.|-
+              : (([Formula], [Formula]) -> Sequent)
+              Pattern {--public--}
+
+--> sequent.|-
+              : (([Formula], [Formula]) -> Sequent)
+              Define {--public--}
+
+--> sequent.|-/-
+              : (Sequent -> ([Formula], [Formula]))
+              Define {--public--}
+
+  50 
+  51 Expect
+  52   isBasic?: Sequent -> Boolean
+  53   %: isBasic?(f) is true if sequent f is basic.
+
+--> sequent.isBasic?
+              : (Sequent -> Boolean)
+              Expect {--public--}
+
+  54   ;
+  55   valid?: Formula -> Boolean
+  56   %: valid?(f) is true if formula f is valid.
+
+--> sequent.valid?
+              : (Formula -> Boolean)
+              Expect {--public--}
+
+  57   ;
+  58   validSequent?: Sequent -> Boolean
+  59   %: validSequent?(x) is true if sequent x is valid.
+
+--> sequent.validSequent?
+              : (Sequent -> Boolean)
+              Expect {--public--}
+
+  60   ;
+  61   allValid?: [Sequent] -> Boolean
+  62   %: allValid?(f) is true if a list of sequents is valid.
+
+--> sequent.allValid?
+              : ([Sequent] -> Boolean)
+              Expect {--public--}
+
+  63   ;
+  64   moveToFront: (FormulaTester,[Formula]) -> [Formula]
+  65   %: moveToFront(t,fs) takes a list of formulas fs and a FormulaTester t.
+
+--> sequent.moveToFront
+              : (((Formula -> Boolean), [Formula]) -> [Formula])
+              Expect {--public--}
+
+  66   ;
+  67   sequentRules:(Sequent,[Rule]) -> Boolean
+  68   %: sequentRules(s,t) takes a sequent s and a list of rules t.
+
+--> sequent.sequentRules
+              : ((Sequent, [(Sequent -> Maybe of ([Sequent]))]) -> Boolean)
+              Expect {--public--}
+
+  69   ;
+  70   orL: Rule;
+
+--> sequent.orL
+              : (Sequent -> Maybe of ([Sequent]))
+              Expect {--public--}
+
+  71   orR: Rule;
+
+--> sequent.orR
+              : (Sequent -> Maybe of ([Sequent]))
+              Expect {--public--}
+
+  72   andL: Rule;
+
+--> sequent.andL
+              : (Sequent -> Maybe of ([Sequent]))
+              Expect {--public--}
+
+  73   andR: Rule;
+
+--> sequent.andR
+              : (Sequent -> Maybe of ([Sequent]))
+              Expect {--public--}
+
+  74   negL: Rule;
+
+--> sequent.negL
+              : (Sequent -> Maybe of ([Sequent]))
+              Expect {--public--}
+
+  75   negR: Rule;
+
+--> sequent.negR
+              : (Sequent -> Maybe of ([Sequent]))
+              Expect {--public--}
+
+  76   impL: Rule;
+
+--> sequent.impL
+              : (Sequent -> Maybe of ([Sequent]))
+              Expect {--public--}
+
+  77   impR: Rule;
+
+--> sequent.impR
+              : (Sequent -> Maybe of ([Sequent]))
+              Expect {--public--}
+
+  78   %%: orL,orR,andL,andR,negL,negR,impL,impR are rules of inference which produce something or nothing.
+  79 %Expect
+  80 
+  81 =============================================
+  82                 implementation
+  83 =============================================
+  84 
+  85 Import "collect/search".
+
+--> Import "/usr/local/lib/cinnameg/9-0-5/lib/collect/search.cmg"
+
+  86 Import "parseSequent".
+
+--> Import "/home/INTRA/salinasj14/comlang/assn5/parseSequent.cmg"
+
+  87 
+  88 ==============================================================
+  89 %%                      isBasic?
+  90 ==============================================================
+  91 %% isBasic? tests whether a given sequent is basic or not.
+  92 %% A sequent is basic if some formula occurs in both the left
+  93 %% side list and the right side. For example, sequent 
+  94 %% P, Q |– P, Q is basic, as is P, Q |– Q. 
+  95 ==============================================================
+  96 Define
+  97 case isBasic? (? |- []) = false
+  98 case isBasic? (alpha |- beta) = someSatisfy (x |-> x `in` beta) alpha
+  99 %Define
+
+--> sequent.isBasic?
+              : (Sequent -> Boolean)
+              Define {--public--}
+
+ 100 
+ 101 ==============================================================
+ 102 %%                     moveToFront
+ 103 ==============================================================
+ 104 %% moveToFront that takes a list of formulas and a formula. If 
+ 105 %% the list contains a formula x such that t(x) is true, then 
+ 106 %% it returns a reordered version of list where x has been moved 
+ 107 %% to the front. If list fs does not contain a valid formula, 
+ 108 %% then moveToFront returns nothing.
+ 109 ==============================================================
+ 110 Define
+ 111 case moveToFront (?, []) = []
+ 112 case moveToFront (alpha, beta) = (select(a |-> alpha(a)) beta) :: beta -/ (select(a |-> alpha(a)) beta) when (someSatisfy(a|-> alpha(a)) beta) 
+ 113 else moveToFront (?,beta) = beta
+ 114 %Define
+
+--> sequent.moveToFront
+              : (((Formula -> Boolean), [Formula]) -> [Formula])
+              Define {--public--}
+
+ 115 
+ 116 ==============================================================
+ 117 %%                         orL
+ 118 ==============================================================
+ 119 %% If rule orL applies to sequent s, then this function should
+ 120 %% apply orL and yield something(L) where L is a list of 
+ 121 %% subgoals needed to prove s according to rule orL.
+ 122 ==============================================================
+ 123 Define
+ 124  case orLHelp (x \/ y :: alpha |- beta) = something [(x :: alpha |- beta),(y :: alpha |- beta)]
+ 125  case orLHelp (?)                       = nothing;
+
+--> private.orLHelp
+              : (Sequent -> Maybe of ([Sequent]))
+              Define {--private--}
+
+ 126  orL(alpha |- beta) = orLHelp(moveToFront(\/?,alpha) |- beta)
+ 127 %Define
+
+--> sequent.orL
+              : (Sequent -> Maybe of ([Sequent]))
+              Define {--public--}
+
+ 128 
+ 129 ==============================================================
+ 130 %%                         orR
+ 131 ==============================================================
+ 132 %% If rule orR applies to sequent s, then this function should
+ 133 %% apply orR and yield something(L) where L is a list of 
+ 134 %% subgoals needed to prove s according to rule orR.
+ 135 ==============================================================
+ 136 Define
+ 137  case orRHelp (alpha |- x \/ y :: beta) = something [alpha |- x :: y :: beta]
+ 138  case orRHelp (?)                       = nothing;
+
+--> private.orRHelp
+              : (Sequent -> Maybe of ([Sequent]))
+              Define {--private--}
+
+ 139  orR(alpha |- beta) = orRHelp(alpha |- moveToFront(\/?,beta))
+ 140 %Define
+
+--> sequent.orR
+              : (Sequent -> Maybe of ([Sequent]))
+              Define {--public--}
+
+ 141 
+ 142 ==============================================================
+ 143 %%                         andL
+ 144 ==============================================================
+ 145 %% If rule andL applies to sequent s, then this function should
+ 146 %% apply andL and yield something(L) where L is a list of 
+ 147 %% subgoals needed to prove s according to rule andL.
+ 148 ==============================================================
+ 149 Define
+ 150  case andLHelp (x /\ y :: alpha |- beta) = something [x :: y :: alpha |- beta]
+ 151  case andLHelp (?)                      = nothing;
+
+--> private.andLHelp
+              : (Sequent -> Maybe of ([Sequent]))
+              Define {--private--}
+
+ 152  andL(alpha |- beta) = andLHelp(moveToFront(/\?,alpha) |- beta)
+ 153 %Define
+
+--> sequent.andL
+              : (Sequent -> Maybe of ([Sequent]))
+              Define {--public--}
+
+ 154 
+ 155 ==============================================================
+ 156 %%                         andR
+ 157 ==============================================================
+ 158 %% If rule andR applies to sequent s, then this function should
+ 159 %% apply andR and yield something(L) where L is a list of 
+ 160 %% subgoals needed to prove s according to rule andR.
+ 161 ==============================================================
+ 162 Define
+ 163  case andRHelp (alpha |- x /\ y :: beta) = something [(alpha |- x :: beta),(alpha |- y :: beta)]
+ 164  case andRHelp (?)                      = nothing;
+
+--> private.andRHelp
+              : (Sequent -> Maybe of ([Sequent]))
+              Define {--private--}
+
+ 165  andR(alpha |- beta) = andRHelp(alpha |- moveToFront(/\?,beta))
+ 166 %Define
+
+--> sequent.andR
+              : (Sequent -> Maybe of ([Sequent]))
+              Define {--public--}
+
+ 167 
+ 168 ==============================================================
+ 169 %%                        negL
+ 170 ==============================================================
+ 171 %% If rule negL applies to sequent s, then this function should
+ 172 %% apply negL and yield something(L) where L is a list of 
+ 173 %% subgoals needed to prove s according to rule negL.
+ 174 ==============================================================
+ 175 Define
+ 176  case negLHelp (neg x :: alpha |- beta) = something [alpha |- x :: beta]
+ 177  case negLHelp (?)                      = nothing;
+
+--> private.negLHelp
+              : (Sequent -> Maybe of ([Sequent]))
+              Define {--private--}
+
+ 178  negL(alpha |- beta) = negLHelp(moveToFront(neg?, alpha) |- beta)
+ 179 %Define
+
+--> sequent.negL
+              : (Sequent -> Maybe of ([Sequent]))
+              Define {--public--}
+
+ 180 
+ 181 ==============================================================
+ 182 %%                        negR
+ 183 ==============================================================
+ 184 %% If rule negR applies to sequent s, then this function should
+ 185 %% apply negR and yield something(L) where L is a list of 
+ 186 %% subgoals needed to prove s according to rule negR.
+ 187 ==============================================================
+ 188 Define
+ 189  case negRHelp (alpha |- neg x :: beta) = something [x :: alpha |- beta]
+ 190  case negRHelp (?)                      = nothing;
+
+--> private.negRHelp
+              : (Sequent -> Maybe of ([Sequent]))
+              Define {--private--}
+
+ 191  negR(alpha |- beta) = negRHelp(alpha |- moveToFront(neg?,beta))
+ 192 %Define
+
+--> sequent.negR
+              : (Sequent -> Maybe of ([Sequent]))
+              Define {--public--}
+
+ 193 
+ 194 ==============================================================
+ 195 %%                         impL
+ 196 ==============================================================
+ 197 %% If rule impL applies to sequent s, then this function should
+ 198 %% apply impL and yield something(L) where L is a list of 
+ 199 %% subgoals needed to prove s according to rule impL.
+ 200 ==============================================================
+ 201 Define
+ 202  case impLHelp (x ==> y :: alpha |- beta) = something [(alpha |- x :: beta),(y :: alpha |- beta)]
+ 203  case impLHelp (?)                      = nothing;
+
+--> private.impLHelp
+              : (Sequent -> Maybe of ([Sequent]))
+              Define {--private--}
+
+ 204  impL(alpha |- beta) = impLHelp(moveToFront(==>?, alpha) |- beta)
+ 205 %Define
+
+--> sequent.impL
+              : (Sequent -> Maybe of ([Sequent]))
+              Define {--public--}
+
+ 206 
+ 207 ==============================================================
+ 208 %%                         impR
+ 209 ==============================================================
+ 210 %% If rule impR applies to sequent s, then this function should
+ 211 %% apply impR and yield something(L) where L is a list of 
+ 212 %% subgoals needed to prove s according to rule impR.
+ 213 ==============================================================
+ 214 Define
+ 215  case impRHelp (alpha |- x ==> y :: beta) = something [x :: alpha |- y :: beta]
+ 216  case impRHelp (?)                      = nothing;
+
+--> private.impRHelp
+              : (Sequent -> Maybe of ([Sequent]))
+              Define {--private--}
+
+ 217  impR(alpha |- beta) = impRHelp(alpha |- moveToFront(==>?,beta))
+ 218 %Define
+
+--> sequent.impR
+              : (Sequent -> Maybe of ([Sequent]))
+              Define {--public--}
+
+ 219 
+ 220 ==============================================================
+ 221 %%                      allValid?
+ 222 ==============================================================
+ 223 %% allValid? takes a list of sequents and returns true if
+ 224 %% every sequent in the list is valid
+ 225 ==============================================================
+ 226 Define 
+ 227  case allValid?(x) = allSatisfy(a |-> validSequent?(a)) x
+ 228 %Define
+
+--> sequent.allValid?
+              : ([Sequent] -> Boolean)
+              Define {--public--}
+
+ 229 
+ 230 ==============================================================
+ 231 %%                    sequentRules
+ 232 ==============================================================
+ 233 %% sequentRules takes a sequent and a list of Rules(functions),
+ 234 %% and tries to use each rule on the sequent. If a rule applies,
+ 235 %% it should use that rule to get one or two new goals, and 
+ 236 %% should test whether the new goals are valid. 
+ 237 ==============================================================
+ 238 Define
+ 239  case sequentRules(?,[]) = false
+ 240  case sequentRules(alpha|-beta, a::b) = sequentRules(alpha|-beta,b) when a(alpha|-beta) == nothing
+ 241  else sequentRules(alpha|-beta,a::?) = allValid?(unsomething(a(alpha|-beta)))
+ 242 %Define
+
+--> sequent.sequentRules
+              : ((Sequent, [(Sequent -> Maybe of ([Sequent]))]) -> Boolean)
+              Define {--public--}
+
+ 243 
+ 244 ==============================================================
+ 245 %%                     validSequent?
+ 246 ==============================================================
+ 247 %% validSequent? takes a sequent and tells whether the sequent
+ 248 %% is valid.
+ 249 ==============================================================
+ 250 Define
+ 251  case validSequent?(alpha|-beta) = isBasic?(alpha|-beta) `or` sequentRules(alpha|-beta,[negL,negR,impR,orR,andL,andR,orL,impL])
+ 252  else validSequent?(?) = false
+ 253 %Define
+
+--> sequent.validSequent?
+              : (Sequent -> Boolean)
+              Define {--public--}
+
+ 254 
+ 255 ==============================================================
+ 256 %%                      valid?
+ 257 ==============================================================
+ 258 %% valid? takes a formula and returns true if it is valid.
+ 259 %% Formula x is valid if and only if sequent |– x is valid
+ 260 ==============================================================
+ 261 Define
+ 262  case valid?(alpha) = validSequent?([] |- [alpha])
+ 263 %Define
+
+--> sequent.valid?
+              : (Formula -> Boolean)
+              Define {--public--}
+
+ 264 
+ 265 Execute
+ 266 Match $(s: Sequent) = "P \\/ Q, -Q |- T /\\ Y".
+ 267 Match $(t: Sequent) = "|- P ==> P".
+ 268 Match $(u: Sequent) = "P, Q|- Q".
+ 269 Match $(us: Sequent) = "P \\/ Q |- Q \\/ P".
+ 270 Match $(paco: Sequent) = "P, Q|-".
+ 271 Match $(mary: Sequent) = "|- P, Q".
+ 272 Match $(sho: Formula) = "P \\/ -P".
+ 273 Match $(sh: Formula) = "P \\/ Q".
+ 274 Match $(shh: Formula) = "P /\\ -P ==> Q".
+ 275 Match $(i: Formula) = "P /\\ Q ==> Q \\/ P".
+ 276 Writeln["P \\/ Q, -Q |- T /\\ Y is ",$validSequent? (s)].
+ 277 Writeln["P, Q |- Q is ",$validSequent? (u)].
+ 278 Writeln["|- P ==> P is ",$validSequent? (t)].
+ 279 Writeln["P, Q |- is ",$validSequent? (paco)].
+ 280 Writeln["P /\\ Q ==> Q \\/ P is ",$valid? i].
+ 281 Writeln["|- P, Q is ",$(validSequent? mary)].
+ 282 Writeln["P \\/ Q is ",$valid? sh].
+ 283 Writeln["P \\/ -P is ",$valid? sho].
+ 284 Writeln["P /\\ -P ==> Q is ",$(valid? shh)].
+ 285 Writeln["P \\/ Q |- Q \\/ P is ",$(validSequent? us)].
+ 286 %Execute
+ 287 
+ 288 %Package
+

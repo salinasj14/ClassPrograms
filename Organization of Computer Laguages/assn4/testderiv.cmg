@@ -1,0 +1,65 @@
+Package testderiv
+
+%% Test the derivative program.
+
+Import "deriv".
+
+====================================================
+%% Simplify tests
+====================================================
+
+Define ShowSimplify(e). =
+  Writeln[$(e), " = ", $(simplify e)].
+%Define
+
+Execute
+  Writeln["Simplify tests\n--------------"].
+  ShowSimplify constant(2) + constant(5).
+  ShowSimplify constant(2) + constant(5) + constant(6).
+  ShowSimplify xx + constant(0).
+  ShowSimplify xx + xx.
+  ShowSimplify xx * xx.
+  ShowSimplify constant(3) * constant(4).
+  ShowSimplify constant(3) ^ constant(3).
+  ShowSimplify constant(20) ^ constant(0).
+  ShowSimplify xx ^ constant(1).
+  ShowSimplify xx ^ constant(2).
+  ShowSimplify constant(0) ^ xx.
+  ShowSimplify xx ^ constant(0).
+  ShowSimplify xx - xx.
+  ShowSimplify constant(0) - xx.
+  ShowSimplify constant(0) + xx.
+  Writeln.
+%Execute
+
+====================================================
+%% Deriv tests
+====================================================
+
+Define ShowDeriv(e). =
+  Writeln["(", $(e), ")' = ",   $ deriv(e)].
+%Define
+
+Execute
+  Writeln["Deriv tests\n----------"].
+  ShowDeriv constant(4) + xx.
+  ShowDeriv constant(0) - xx.
+  ShowDeriv xx + xx.
+  ShowDeriv xx * xx.
+  ShowDeriv xx - xx.
+  ShowDeriv xx + constant(5)*xx.
+  ShowDeriv constant(2) * constant(3) * xx.
+  ShowDeriv xx ^ constant(3).
+  ShowDeriv constant(0) * xx.
+  ShowDeriv xx * constant(0).
+  ShowDeriv constant(50) + xx ^ constant(2).
+  ShowDeriv xx ^ constant(0).
+  ShowDeriv xx ^ constant(1).
+  ShowDeriv xx - xx.
+  ShowDeriv constant(2) * xx ^ constant(5).
+  ShowDeriv constant(5) ^ constant(2).
+  ShowDeriv constant(5) * xx.
+  ShowDeriv xx * constant(5).
+  ShowDeriv constant(5) ^ constant(0).
+%Execute
+%Package

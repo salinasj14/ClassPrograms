@@ -1,0 +1,179 @@
+
+
+Converted form of expression/paragraph:
+
+-  15.   Execute
+-  16.     Writeln ["Simplify tests\n--------------"] %Writeln
+-  17.     ShowSimplify ((constant(2)) + (constant(5))) %ShowSimplify
+-  18.     ShowSimplify (((constant(2)) + (constant(5))) + (constant(6))) %ShowSimplify
+-  19.     ShowSimplify (xx + (constant(0))) %ShowSimplify
+-  20.     ShowSimplify ((constant(0)) + xx) %ShowSimplify
+-  21.     ShowSimplify ((5 * xx) deriv.+ (5 * xx)) %ShowSimplify
+-  22.     ShowSimplify ((constant(3)) deriv.* (constant(4))) %ShowSimplify
+-  24.     Writeln () %Writeln
+-  15.   %Execute
+
+-----Types:
+
+-  16.   Writeln         : ([String] -> ())
+-  16.   ::              : ((String, [String]) -> [String])
+-  17.   ShowSimplify    : (Expression -> ())
+-  17.   +               : ((Expression, Expression) -> Expression)
+-  17.   constant        : (Real -> Expression)
+-  17.   castInt         : (Integer -> Real)
+-  17.   constant        : (Real -> Expression)
+-  17.   castInt         : (Integer -> Real)
+-  18.   ShowSimplify    : (Expression -> ())
+-  18.   +               : ((<a:AnyEq>, Expression) -> Expression)
+-  18.   +               : ((Expression, Expression) -> <a:AnyEq>)
+-  18.   constant        : (Real -> Expression)
+-  18.   castInt         : (Integer -> Real)
+-  18.   constant        : (Real -> Expression)
+-  18.   castInt         : (Integer -> Real)
+-  18.   constant        : (Real -> Expression)
+-  18.   castInt         : (Integer -> Real)
+-  19.   ShowSimplify    : (Expression -> ())
+-  19.   +               : ((Expression, Expression) -> Expression)
+-  19.   xx              : Expression
+-  19.   constant        : (Real -> Expression)
+-  19.   castInt         : (Integer -> Real)
+-  20.   ShowSimplify    : (Expression -> ())
+-  20.   +               : ((Expression, Expression) -> Expression)
+-  20.   constant        : (Real -> Expression)
+-  20.   castInt         : (Integer -> Real)
+-  20.   xx              : Expression
+-  21.   ShowSimplify    : (Expression -> ())
+-  21.   deriv.+         : ((Expression, Expression) -> Expression)
+-  21.   *               : ((<b:AnyNum>, Expression) -> Expression)
+-  21.   castInt         : (Integer -> <b:AnyNum>)
+-  21.   xx              : Expression
+-  21.   *               : ((<c:AnyNum>, Expression) -> Expression)
+-  21.   castInt         : (Integer -> <c:AnyNum>)
+-  21.   xx              : Expression
+-  22.   ShowSimplify    : (Expression -> ())
+-  22.   deriv.*         : ((Expression, Expression) -> Expression)
+-  22.   constant        : (Real -> Expression)
+-  22.   castInt         : (Integer -> Real)
+-  22.   constant        : (Real -> Expression)
+-  22.   castInt         : (Integer -> Real)
+-  24.   Writeln         : (() -> ())
+
+
+
+---------------------------------------------------
+--- Summary of inference steps leading to error ---
+
+---------------------------------------------------
+
+  Line 21. If function f has type S -> T then expression f(A) must have type T.
+
+  Function f =
+  -  21.  castInt
+
+         : (Integer -> <a>)
+           where(<a:AnyNum>)
+
+  Argument A =
+  -  21.  5
+
+
+  Type of f(A): <b>
+---------------------------------------------------
+
+  Line 21. Expression (A,B) has type (S,T) when A has type S and B has type T.
+
+  A =
+  -  21.  5
+
+         : <a>
+           where(<a:AnyNum>)
+
+  B =
+  -  21.  xx
+
+         : Expression
+
+  Expr =
+  -  21.  (5, xx)
+
+         : <c>
+
+
+  Line 21. After unification:
+
+  A =
+  -  21.  5
+
+         : <a>
+           where(<a:AnyNum>)
+
+  B =
+  -  21.  xx
+
+         : Expression
+
+  Expr =
+  -  21.  (5, xx)
+
+         : (<a>, Expression)
+           where(<a:AnyNum>)
+
+---------------------------------------------------
+
+  Line 21. If function f has type S -> T then its argument must have type S.
+  Function:
+  -  21.  (*)
+
+         : ((<d>, <e>) -> <f>)
+           where(<d:AnyEq>, <e:AnyEq>, <f:AnyEq>)
+
+    Argument:
+  -  21.  (5, xx)
+
+         : (<a>, Expression)
+           where(<a:AnyNum>)
+
+---------------------------------------------------
+
+  Line 21. If function f has type S -> T then expression f(A) must have type T.
+
+  Function f =
+  -  21.  (*)
+
+         : ((<a>, Expression) -> <f>)
+           where(<a:AnyNum>, <f:AnyEq>)
+
+  Argument A =
+  -  21.  (5, xx)
+
+
+  Type of f(A): <g>
+---------------------------------------------------
+
+  Line 21. An expectation (package deriv, line 71) shows that deriv.+ has type 
+  ((Expression, Expression) -> Expression)
+  Current type:
+  -  21.  (deriv.+)
+
+         : ((<h>, <f>) -> Expression)
+           where(<h:AnyEq>, <f:AnyEq>)
+
+---------------------------------------------------
+
+  Line 21. The type of identifier "*" does not match any available types.
+  This program requires
+
+  -  21.  (*)
+
+         : ((<a>, Expression) -> Expression)
+           where(<a:AnyNum>)
+   
+     Available types for "*":
+     ((Expression, Expression) -> Expression)
+     ((<za>, <za>) -> <za>)
+          where(<za:AnyNum>)
+
+
+---------------------------------------------------
+
+

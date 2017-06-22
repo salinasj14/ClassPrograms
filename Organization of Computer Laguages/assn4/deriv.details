@@ -1,0 +1,287 @@
+
+
+Converted form of expression/paragraph:
+
+- 394.   Define rawDeriv =
+- 394.     (param-1 |->
+- 394.        Scope*
+- 394.          Define \target95 =
+- 394.            param-1
+- 394.          %Define
+- 394.          Yield
+- 394.            Try* {--normal--}
+- 394.              Match constant(?) =~ \target95 %Match
+- 394.            then
+- 394.              constant(0)
+- 400.            else
+- 400.              Try* {--normal--}
+- 400.                Match (= xx) =~ \target95 %Match
+- 400.              then
+- 400.                constant(1)
+- 406.              else
+- 406.                Try* {--normal--}
+- 406.                  Match (a + b) =~ \target95 %Match
+- 406.                then
+- 406.                  ((rawDeriv(a)) + (rawDeriv(b)))
+- 412.                else
+- 412.                  Try* {--normal--}
+- 412.                    Match (a - b) =~ \target95 %Match
+- 412.                  then
+- 412.                    ((rawDeriv(a)) - (rawDeriv(b)))
+- 418.                  else
+- 418.                    Try* {--normal--}
+- 418.                      Match (a * b) =~ \target95 %Match
+- 418.                    then
+- 418.                      ((a * (rawDeriv(b))) + ((rawDeriv(a)) * b))
+- 420.                    else
+- 420.                      Try* {--normal--}
+- 420.                        Match (a ^ b) =~ \target95 %Match
+- 420.                      then
+- 420.                        (((b * a) deriv.* ((deriv.^)(b - (constant(1))))) deriv.* (rawDeriv(a)))
+- 422.                      else
+- 422.                        Match e =~ \target95 %Match
+- 422.                        Ensure false else derivativeX(e) %Ensure
+- 420.                      %Try*
+- 418.                    %Try*
+- 412.                  %Try*
+- 406.                %Try*
+- 400.              %Try*
+- 394.            %Try*
+- 394.          %Yield
+- 394.        %Scope*)
+- 394.   %Define
+
+(\x is an internally generated name.
+Some expressions have been converted to an internal form,
+and what is shown might not be allowed in source.)
+
+
+-----Types:
+
+- 394.   rawDeriv        : (Expression -> Expression)
+- 394.   param-1         : Expression
+- 388.   \target95       : Expression
+- 394.   constant        : (Real -> Expression)
+- 394.   ?               : Real
+- 394.   \target95       : Expression
+- 394.   constant        : (Real -> Expression)
+- 394.   castInt         : (Integer -> Real)
+- 400.   xx              : Expression
+- 400.   \target95       : Expression
+- 400.   constant        : (Real -> Expression)
+- 400.   castInt         : (Integer -> Real)
+- 406.   +               : ((Expression, Expression) -> Expression)
+- 406.   a               : Expression
+- 406.   b               : Expression
+- 406.   \target95       : Expression
+- 406.   +               : ((Expression, Expression) -> Expression)
+- 406.   rawDeriv        : (Expression -> Expression)
+- 412.   -               : ((Expression, Expression) -> Expression)
+- 412.   a               : Expression
+- 412.   b               : Expression
+- 412.   \target95       : Expression
+- 412.   -               : ((Expression, Expression) -> Expression)
+- 412.   rawDeriv        : (Expression -> Expression)
+- 418.   *               : ((Expression, Expression) -> Expression)
+- 418.   a               : Expression
+- 418.   b               : Expression
+- 418.   \target95       : Expression
+- 418.   +               : ((<a:AnyEq>, <b:AnyEq>) -> Expression)
+- 418.   *               : ((Expression, Expression) -> <a:AnyEq>)
+- 418.   rawDeriv        : (Expression -> Expression)
+- 418.   *               : ((Expression, Expression) -> <b:AnyEq>)
+- 420.   ^               : ((Expression, <c:1AnyEq>) -> Expression)
+- 420.   a               : Expression
+- 420.   b               : <c:1AnyEq>
+- 420.   \target95       : Expression
+- 420.   deriv.*         : ((Expression, Expression) -> Expression)
+- 420.   deriv.*         : ((Expression, Expression) -> Expression)
+- 420.   *               : ((<c:1AnyEq>, Expression) -> Expression)
+- 420.   deriv.^         : ((Expression, Expression) -> Expression)
+- 420.   -               : ((<c:1AnyEq>, Expression) -> (Expression, Expression))
+- 420.   constant        : (Real -> Expression)
+- 420.   castInt         : (Integer -> Real)
+- 420.   rawDeriv        : (Expression -> Expression)
+- 422.   e               : Expression
+- 422.   \target95       : Expression
+- 422.   derivativeX     : (Expression -> ExceptionType)
+
+
+
+---------------------------------------------------
+--- Summary of inference steps leading to error ---
+
+---------------------------------------------------
+
+  Line 420. If function f has type S -> T then expression f(A) must have type T.
+
+  Function f =
+  - 420.  castInt
+
+         : (Integer -> <b>)
+           where(<b:AnyRing>)
+
+  Argument A =
+  - 420.  1
+
+
+  Type of f(A): <c>
+---------------------------------------------------
+
+  Line 420. If function f has type S -> T then its argument must have type S.
+  Function:
+  - 420.  constant
+
+         : (Real -> Expression)
+
+    Argument:
+  - 420.  1
+
+         : <b>
+           where(<b:AnyRing>)
+
+---------------------------------------------------
+
+  Line 420. If function f has type S -> T then expression f(A) must have type T.
+
+  Function f =
+  - 420.  constant
+
+         : (Real -> Expression)
+
+  Argument A =
+  - 420.  1
+
+
+  Type of f(A): <d>
+---------------------------------------------------
+
+  Line 420. Expression (A,B) has type (S,T) when A has type S and B has type T.
+
+  A =
+  - 420.  b
+
+         : <a>
+           where(<a:1AnyEq>)
+
+  B =
+  - 420.  (constant(1))
+
+         : Expression
+
+  Expr =
+  - 420.  (b, constant(1))
+
+         : <e>
+
+
+  Line 420. After unification:
+
+  A =
+  - 420.  b
+
+         : <a>
+           where(<a:1AnyEq>)
+
+  B =
+  - 420.  (constant(1))
+
+         : Expression
+
+  Expr =
+  - 420.  (b, constant(1))
+
+         : (<a>, Expression)
+           where(<a:1AnyEq>)
+
+---------------------------------------------------
+
+  Line 420. If function f has type S -> T then its argument must have type S.
+  Function:
+  - 420.  (-)
+
+         : (<f> -> <g>)
+           where(<g:AnyEq>)
+
+    Argument:
+  - 420.  (b, constant(1))
+
+         : (<a>, Expression)
+           where(<a:1AnyEq>)
+
+---------------------------------------------------
+
+  Line 420. If function f has type S -> T then expression f(A) must have type T.
+
+  Function f =
+  - 420.  (-)
+
+         : ((<a>, Expression) -> <g>)
+           where(<a:1AnyEq>, <g:AnyEq>)
+
+  Argument A =
+  - 420.  (b, constant(1))
+
+
+  Type of f(A): <h>
+---------------------------------------------------
+
+  Line 420. If function f has type S -> T then its argument must have type S.
+  Function:
+  - 420.  (deriv.^)
+
+         : ((<i>, <j>) -> <k>)
+           where(<i:AnyEq>, <j:1AnyEq>, <k:AnyEq>)
+
+    Argument:
+  - 420.  (b - (constant(1)))
+
+         : <g>
+           where(<g:AnyEq>)
+
+---------------------------------------------------
+
+  Line 420. If function f has type S -> T then expression f(A) must have type T.
+
+  Function f =
+  - 420.  (deriv.^)
+
+         : ((<l>, <j>) -> <k>)
+           where(<l:AnyEq>, <j:1AnyEq>, <k:AnyEq>)
+
+  Argument A =
+  - 420.  (b - (constant(1)))
+
+
+  Type of f(A): <m>
+---------------------------------------------------
+
+  Line 420. An expectation (package deriv, line 89) shows that deriv.^ has type 
+  ((Expression, Expression) -> Expression)
+  Current type:
+  - 420.  (deriv.^)
+
+         : ((<l>, <j>) -> Expression)
+           where(<l:AnyEq>, <j:1AnyEq>)
+
+---------------------------------------------------
+
+  Line 420. The type of identifier "-" does not match any available types.
+  This program requires
+
+  - 420.  (-)
+
+         : ((<a>, Expression) -> (Expression, Expression))
+           where(<a:1AnyEq>)
+   
+     Available types for "-":
+     ((<za>, <za>) -> <za>)
+          where(<za:AnyGroup>)
+     ((Expression, Expression) -> Expression)
+     (<za> -> <za>)
+          where(<za:AnyGroup>)
+
+
+---------------------------------------------------
+
+
