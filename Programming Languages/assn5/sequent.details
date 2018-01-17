@@ -1,0 +1,159 @@
+
+
+Converted form of expression/paragraph:
+
+- 227.   Define allValid? =
+- 227.     (param-1 |->
+- 227.        Scope*
+- 227.          Define \target140 =
+- 227.            param-1
+- 227.          %Define
+- 227.          Yield
+- 227.            Try* {--normal--}
+- 227.              Match (alpha |- beta) =~ \target140 %Match
+- 227.            then
+- 227.              ((allSatisfy(a |-> validSequent?(a))(alpha)) |- beta)
+- 228.            else
+- 228.              Ensure false else noMatchCaseX(view(\target140)) %Ensure
+- 227.            %Try*
+- 227.          %Yield
+- 227.        %Scope*)
+- 227.   %Define
+
+(\x is an internally generated name.
+Some expressions have been converted to an internal form,
+and what is shown might not be allowed in source.)
+
+
+-----Types:
+
+- 227.   allValid?       : ([Sequent] -> Boolean)
+- 227.   param-1         : Sequent
+- 226.   \target140      : Sequent
+- 227.   |-              : (([Formula], [Formula]) -> Sequent)
+- 227.   alpha           : [Formula]
+- 227.   beta            : [Formula]
+- 227.   \target140      : Sequent
+- 227.   |-              : (([Formula], [Formula]) -> Sequent)
+- 227.   allSatisfy      : ((Sequent -> Boolean) -> (<a:AnyCollection> of (Sequent) -> Boolean))
+- 227.   a               : Sequent
+- 227.   validSequent?   : (Sequent -> Boolean)
+- 228.   noMatchCaseX    : (String -> ExceptionType)
+- 228.   view            : (<b> -> String)
+- 228.   \target140      : Sequent
+
+
+
+---------------------------------------------------
+--- Summary of inference steps leading to error ---
+
+---------------------------------------------------
+
+  Line 227. If function f has type S -> T then its argument must have type S.
+  Function:
+  - 227.  validSequent?
+
+         : (Sequent -> Boolean)
+
+    Argument:
+  - 227.  a
+
+         : <b>
+
+---------------------------------------------------
+
+  Line 227. If function f has type S -> T then expression f(A) must have type T.
+
+  Function f =
+  - 227.  validSequent?
+
+         : (Sequent -> Boolean)
+
+  Argument A =
+  - 227.  a
+
+
+  Type of f(A): <c>
+---------------------------------------------------
+
+  Line 227. Expression (A |-> B) has type (S -> T) when A has type S and B has type T.
+
+  A =
+  - 227.  a
+
+         : Sequent
+
+  B (inference core) =
+  - 227.  (validSequent?(a))
+
+         : Boolean
+
+  Expr =
+  - 227.  (a |-> validSequent?(a))
+
+         : <d>
+
+
+  Line 227. After unification:
+
+  A =
+  - 227.  a
+
+         : Sequent
+
+  B (inference core) =
+  - 227.  (validSequent?(a))
+
+         : Boolean
+
+  Expr =
+  - 227.  (a |-> validSequent?(a))
+
+         : (Sequent -> Boolean)
+
+---------------------------------------------------
+
+  Line 227. If function f has type S -> T then its argument must have type S.
+  Function:
+  - 227.  allSatisfy
+
+         : ((<e> -> Boolean) -> (<a> of (<e>) -> Boolean))
+           where(<a:AnyCollection>)
+
+    Argument:
+  - 227.  (a |-> validSequent?(a))
+
+         : (Sequent -> Boolean)
+
+---------------------------------------------------
+
+  Line 227. If function f has type S -> T then expression f(A) must have type T.
+
+  Function f =
+  - 227.  allSatisfy
+
+         : ((Sequent -> Boolean) -> (<a> of (Sequent) -> Boolean))
+           where(<a:AnyCollection>)
+
+  Argument A =
+  - 227.  (a |-> validSequent?(a))
+
+
+  Type of f(A): <f>
+---------------------------------------------------
+
+  Line 227. If function f has type S -> T then its argument must have type S.
+  Function:
+  - 227.  (allSatisfy(a |-> validSequent?(a)))
+
+         : (<a> of (Sequent) -> Boolean)
+           where(<a:AnyCollection>)
+
+    Argument:
+  - 227.  alpha
+
+         : [Formula]
+
+---------------------------------------------------
+
+

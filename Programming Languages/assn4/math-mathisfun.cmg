@@ -1,0 +1,177 @@
+%% File  : math/mathfun.cmg
+%% Author: Karl Abrahamson
+%% Copyright (c) 2011 Karl Abrahamson
+%% Please see file copyright.txt
+
+%%=====================================================================
+Package                 LibraryMathFun
+
+                        Interface
+=======================================================================
+
+=======================================================================
+%% This package provides assorted mathematical functions, such
+%% as sqrt, sin and exp.
+=======================================================================
+
+Import "math".
+Namespace cmg.
+
+=================================================================
+Abbrev {--private--}:
+  ApproxFun  = ~<x:AnyApprox> -> ~<x:AnyApprox>;
+  Realfun    = Real -> Real;
+  WApproxFun = <x:2AnyApprox> -> <x:2AnyApprox>; 
+%Abbrev
+=================================================================
+Operator ^*(^).
+=================================================================
+
+Anticipate
+  ^*            : (<a>, <a>)     -> <a>
+                  where (<a:AnyApprox>)
+  
+                %: x^*y  is the principal value of x to the y power.
+                %: It requires that x >= 0.
+                %: It fails with exception domainX("0^0") if
+                %: x and y are both zero, and with exception
+                %: domainX("negative number to real power") if x < 0.
+                ;
+
+  cos           : ApproxFun
+  
+                %: cos(x) is the (approximate) cosine of x, where x
+                %: is in radians.
+                ;
+
+  exp           : ApproxFun
+  
+                %: exp(x) is (approximately) e to the power x.
+                ;
+                
+  ln            : ApproxFun
+
+                %: ln(x) is (approximately) the natural log of x.  
+                %: It fails with exception 
+                %: domainX("ln of a nonpositive number") if x <= 0.
+                ;
+
+  magnitude     : ~<a:AnyNumber> -> Real
+  
+                %: magnitude(x) is the distance from x to the origin
+                %: of the complex plane.
+                ;
+                
+  sin           : ApproxFun
+
+                %: sin(x) is the (approximate) sine of x, where x
+                %: is in radians.
+                ;
+                
+  sqrt          : ApproxFun
+
+                %: sqrt(x) is (approximately) the square root of x.
+                ;
+
+  round         : (~<a:AnyNfield>, Integer) -> ~<a:AnyNfield>
+  
+                %: round(x,n) produces the result of rounding x
+                %: to n decimal digits of precision.
+                ;
+
+%Anticipate
+=======================================================================
+
+Expect
+  ^*            : (Real, Real) -> Real;
+  cos           : Realfun;
+  cos           : WApproxFun;
+  exp           : Realfun;
+  exp           : WApproxFun;
+  invtan        : Realfun
+
+                %: invtan(x) is (approximately) the inverse tangent of x,
+                %: in radians.
+                ;
+
+  ln            : Realfun;
+  ln            : WApproxFun;
+  log           : <a> -> <a> -> <a>
+                  where (<a:AnyApprox>)
+  
+                %: log b x  is the logarithm base b of x.
+                %: For type Real, b and x must both be
+                %: positive.  For type Complex, b and x
+                %: must both be nonzero.
+                ;
+
+  round         : (Rational, Integer) -> Rational;
+  round         : (Real, Integer) -> Real;
+  magnitude     : <a:AnyNum>      -> Real;
+  magnitude     : <a:2AnyNumber>  -> Real;
+
+  {--underride--}
+  sqmagnitude   : <a:AnyNumber>   -> Real
+  
+                %: sqmagnitude(x) is the square of the magnitude of x.
+                %: See magnitude.
+                ;
+                
+  sin           : Realfun;
+  sin           : WApproxFun;
+  sqrt          : Realfun;
+  sqrt          : WApproxFun;
+  tan           : ApproxFun
+
+                %: tan(x) is (approximately) the tangent of x,
+                %: where x is in radians.
+                ;
+                
+  pi            : () -> Real;
+
+  {--underride--}:
+  
+  ^*            : (<a>, <a>) -> <a>
+                  where (<a:2AnyApprox>);
+%Expect
+
+=======================================================================
+%% The "-math" library provides some primitive operations.  They
+%% are described below.
+=======================================================================
+
+Import "-math".
+
+Description
+  reNormalSqrt  : Real -> Real
+  
+                %: reNormalSqrt(x) is a normal precision approximation
+                %: to the square root of x.
+                ;
+                
+  reNormalExp   : Real -> Real
+  
+                %: reNormalExp(x) is a normal precision approximation
+                %: to exp(x).
+                ;
+
+  reNormalLn    : Real -> Real
+  
+                %: reNormalLn(x) is a normal precision approximation
+                %: to ln(x).
+                ;
+
+  reNormalSin   : Real -> Real
+  
+                %: reNormalSin(x) is a normal precision approximation
+                %: to sin(x).
+                ;
+
+  reNormalInvtan: Real -> Real
+  
+                %: reNormalInvtan(x) is a normal precision approximation
+                %: to invtan(x).
+                ;
+%Description
+
+%Package

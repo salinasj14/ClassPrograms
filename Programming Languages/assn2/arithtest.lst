@@ -1,0 +1,255 @@
+Fri Sep 23 12:39:16 2016
+ECU Cinnameg, version 9.0.5 (byte code version 73)
+File /home/INTRA/salinasj14/comlang/assn2/arithtest.cmg
+
+
+   1 %% Name: Jose Salinas
+   2 %% Date: 09/18/2016
+   3 %% Tabs: 2
+   4 
+   5 Package arithtest
+   6 
+   7 Import "arithmetic".
+
+--> Import "/home/INTRA/salinasj14/comlang/assn2/arithmetic.cmg"
+
+   8 
+   9 %% The following functions are provided for convenience.
+  10 
+  11 Expect 
+  12   intToBinary: Integer -> [Integer]
+  13      %: intToBinary(n) is the binary equivalent of
+  14      %: nonnegative integer n.
+
+--> private.intToBinary
+              : (Integer -> [Integer])
+              Expect {--private--}
+
+  15      ;
+  16 
+  17   binaryToInt: [Integer] -> Integer
+  18      %: binaryToInt(x) is the integer that binary
+  19      %: list x stands for.
+
+--> private.binaryToInt
+              : ([Integer] -> Integer)
+              Expect {--private--}
+
+  20 %Expect
+  21 
+  22 Define 
+  23   case intToBinary (0)     = []
+  24   case intToBinary (2*n)   = 0 :: intToBinary(n)
+  25   case intToBinary (2*n+1) = 1 :: intToBinary(n)
+  26 %Define
+
+--> private.intToBinary
+              : (Integer -> [Integer])
+              Define {--private--}
+
+  27 
+  28 Example
+  29   intToBinary(12) = [0,0,1,1]
+  30 %Example
+  31 
+  32 Define 
+  33   case binaryToInt([])   = 0
+  34   case binaryToInt(0::x) = 2*binaryToInt(x)
+  35   case binaryToInt(1::x) = 2*binaryToInt(x) + 1
+  36 %Define
+
+--> private.binaryToInt
+              : ([Integer] -> Integer)
+              Define {--private--}
+
+  37 
+  38 Example
+  39   binaryToInt([0,0,1,1]) = 12
+  40 %Example
+  41 
+  42 %% Note: $(x) is x converted to a string.  It is similar
+  43 %% to x.tostring() in Java.
+  44 
+  45 Define TestInc(n: Integer). =
+  46   !x = intToBinary(n).
+  47   !y = inc(x).
+  48   !z = binaryToInt(y).
+  49 
+  50   If z == n + 1 then
+  51     Displayln "inc works for %(n) and is %(z)".
+  52   else
+  53     Displayln "***inc(%(n)) = %(z)".
+  54     Displayln "---inc(%(x)) = %(y)".
+  55   %If
+  56 %Define
+
+--> Private.TestInc
+              : (Integer -> ())
+              Define {--private--}
+
+  57 
+  58 Execute
+  59   TestInc(0).
+  60   TestInc(1).
+  61   TestInc(2).
+  62   TestInc(31).
+  63   TestInc(63).
+  64   TestInc(127).
+  65   TestInc(1000).
+  66   Displayln"". 
+  67 %Execute
+  68 
+  69  Define TestDec(n: Integer). =
+  70   !x = intToBinary(n).
+  71   !y = dec(x).
+  72   !z = binaryToInt(y).
+  73 
+  74   If z == n - 1 then
+  75     Displayln "dec works for %(n) and is %(z)".
+  76   else
+  77     Displayln "***dec(%(n)) = %(z)".
+  78     Displayln "---dec(%(x)) = %(y)".
+  79   %If
+  80 %Define
+
+--> Private.TestDec
+              : (Integer -> ())
+              Define {--private--}
+
+  81 
+  82 Execute
+  83   TestDec(0).
+  84   TestDec(43).
+  85   TestDec(65).
+  86   TestDec(26).
+  87   TestDec(75).
+  88   TestDec(10000).
+  89   Displayln"".
+  90   
+  91 %Execute
+  92 
+  93 Define TestSum(n: Integer,t: Integer). =
+  94   !x = intToBinary(n).
+  95   !k = intToBinary(t).
+  96   !y = sum(x,k).
+  97   !z = binaryToInt(y).
+  98 
+  99   If z == n + t then
+ 100     Displayln "sum works for %(n) and %(t), the answer is %(z)".
+ 101   else
+ 102     Displayln "***sum(%(n) %(t)) = %(z)".
+ 103     Displayln "---sum(%(x)) = %(y)".
+ 104   %If
+ 105 %Define
+
+--> Private.TestSum
+              : ((Integer, Integer) -> ())
+              Define {--private--}
+
+ 106 
+ 107 Execute
+ 108   TestSum(3,2).
+ 109   TestSum(11,25).
+ 110   TestSum(11,11).
+ 111   TestSum(101,190).
+ 112   TestSum(600,190).
+ 113   TestSum(700,190).
+ 114   TestSum(10000,190).
+ 115   Displayln"".
+ 116   
+ 117 %Execute
+ 118 
+ 119 Define TestDiff(n: Integer,t: Integer). =
+ 120   !x = intToBinary(n).
+ 121   !k = intToBinary(t).
+ 122   !y = diff(x,k).
+ 123   !z = binaryToInt(y).
+ 124 
+ 125   If z == n - t then
+ 126     Displayln "diff works for %(n) and %(t), the answer is %(z)".
+ 127   else
+ 128     Displayln "***diff(%(n) %(t)) = %(z)".
+ 129     Displayln "---diff(%(x)) = %(y)".
+ 130   %If
+ 131 %Define
+
+--> Private.TestDiff
+              : ((Integer, Integer) -> ())
+              Define {--private--}
+
+ 132 
+ 133 Execute
+ 134   TestDiff(0,5).
+ 135   TestDiff(7,4).
+ 136   TestDiff(5,0).
+ 137   TestDiff(5,4).
+ 138   TestDiff(20,19).
+ 139   TestDiff(19,20).
+ 140   TestDiff(8297382,827684).
+ 141   TestDiff(5678,1432).
+ 142   Displayln"".
+ 143   
+ 144 %Execute
+ 145 
+ 146 Define TestProd(n: Integer,t: Integer). =
+ 147   !x = intToBinary(n).
+ 148   !k = intToBinary(t).
+ 149   !y = product(x,k).
+ 150   !z = binaryToInt(y).
+ 151 
+ 152   If z == n * t then
+ 153     Displayln "prod works for %(n) and %(t), the answer is %(z)".
+ 154   else
+ 155     Displayln "***prod(%(n) $(t)) = %(z)".
+ 156     Displayln "---prod(%(x)) = %(y)".
+ 157   %If
+ 158 %Define
+
+--> Private.TestProd
+              : ((Integer, Integer) -> ())
+              Define {--private--}
+
+ 159 
+ 160 Execute
+ 161   TestProd(2,3).
+ 162   TestProd(14,82).
+ 163   TestProd(4,4).
+ 164   TestProd(9,1).
+ 165   TestProd(4,18932).
+ 166   TestProd(0,0).
+ 167   TestProd(1,1).
+ 168   TestProd(42,14).
+ 169   TestProd(42,0).
+ 170   TestProd(0,42).
+ 171   Displayln"".
+ 172 %Execute
+ 173 
+ 174 Define TestComp(n: Integer,t: Integer). =
+ 175   !x = intToBinary(n).
+ 176   !k = intToBinary(t).
+ 177   !y = compareInts(x,k).
+ 178   Displayln "Comparison is %(n) %(y) %(t)".
+ 179 %Define
+
+--> Private.TestComp
+              : ((Integer, Integer) -> ())
+              Define {--private--}
+
+ 180 
+ 181 Execute
+ 182   TestComp(0,0).
+ 183   TestComp(3,6).
+ 184   TestComp(4,2).
+ 185   TestComp(66,66).  
+ 186   TestComp(0,1).
+ 187   TestComp(1,2).
+ 188   TestComp(2,3).
+ 189   TestComp(3,2).
+ 190   TestComp(4,3).
+ 191   TestComp(1,8).
+ 192   TestComp(12,10).
+ 193   TestComp(1224,1228).
+ 194   Displayln"".
+ 195 %Execute
+ 196 %Package
+

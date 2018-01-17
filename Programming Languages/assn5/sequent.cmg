@@ -1,0 +1,288 @@
+%% Name: Jose Salinas
+%% Date: 11/02/2016
+%% Tabs: 2
+Package sequent
+
+=============================================
+                  export
+=============================================
+
+=============================================
+%%             Binary operators
+=============================================
+
+Operator 
+  |-  (++);
+  \/  (+);
+  /\  (*);
+  ==> (opL5)
+%Operator
+
+=============================================
+%%             Formula
+=============================================
+
+Type Formula =
+    vbl String
+  | neg Formula
+  | Formula /\ Formula
+  | Formula \/ Formula
+  | Formula ==> Formula
+with
+  $, show, ==
+%Type
+
+Abbrev
+  MaybeSequents = Maybe of [Sequent];
+  FormulaTester = Formula -> Boolean;
+  Rule          = Sequent -> MaybeSequents
+%Abbrev
+
+=============================================
+%%             Sequent
+=============================================
+
+Type Sequent =
+  [Formula] |- [Formula]
+with
+  $, show, ==
+%Type
+
+Expect
+  isBasic?: Sequent -> Boolean
+  %: isBasic?(f) is true if sequent f is basic.
+  ;
+  valid?: Formula -> Boolean
+  %: valid?(f) is true if formula f is valid.
+  ;
+  validSequent?: Sequent -> Boolean
+  %: validSequent?(x) is true if sequent x is valid.
+  ;
+  allValid?: [Sequent] -> Boolean
+  %: allValid?(f) is true if a list of sequents is valid.
+  ;
+  moveToFront: (FormulaTester,[Formula]) -> [Formula]
+  %: moveToFront(t,fs) takes a list of formulas fs and a FormulaTester t.
+  ;
+  sequentRules:(Sequent,[Rule]) -> Boolean
+  %: sequentRules(s,t) takes a sequent s and a list of rules t.
+  ;
+  orL: Rule;
+  orR: Rule;
+  andL: Rule;
+  andR: Rule;
+  negL: Rule;
+  negR: Rule;
+  impL: Rule;
+  impR: Rule;
+  %%: orL,orR,andL,andR,negL,negR,impL,impR are rules of inference which produce something or nothing.
+%Expect
+
+=============================================
+                implementation
+=============================================
+
+Import "collect/search".
+Import "parseSequent".
+
+==============================================================
+%%                      isBasic?
+==============================================================
+%% isBasic? tests whether a given sequent is basic or not.
+%% A sequent is basic if some formula occurs in both the left
+%% side list and the right side. For example, sequent 
+%% P, Q |– P, Q is basic, as is P, Q |– Q. 
+==============================================================
+Define
+case isBasic? (? |- []) = false
+case isBasic? (alpha |- beta) = someSatisfy (x |-> x `in` beta) alpha
+%Define
+
+==============================================================
+%%                     moveToFront
+==============================================================
+%% moveToFront that takes a list of formulas and a formula. If 
+%% the list contains a formula x such that t(x) is true, then 
+%% it returns a reordered version of list where x has been moved 
+%% to the front. If list fs does not contain a valid formula, 
+%% then moveToFront returns nothing.
+==============================================================
+Define
+case moveToFront (?, []) = []
+case moveToFront (alpha, beta) = (select(a |-> alpha(a)) beta) :: beta -/ (select(a |-> alpha(a)) beta) when (someSatisfy(a|-> alpha(a)) beta) 
+else moveToFront (?,beta) = beta
+%Define
+
+==============================================================
+%%                         orL
+==============================================================
+%% If rule orL applies to sequent s, then this function should
+%% apply orL and yield something(L) where L is a list of 
+%% subgoals needed to prove s according to rule orL.
+==============================================================
+Define
+ case orLHelp (x \/ y :: alpha |- beta) = something [(x :: alpha |- beta),(y :: alpha |- beta)]
+ case orLHelp (?)                       = nothing;
+ orL(alpha |- beta) = orLHelp(moveToFront(\/?,alpha) |- beta)
+%Define
+
+==============================================================
+%%                         orR
+==============================================================
+%% If rule orR applies to sequent s, then this function should
+%% apply orR and yield something(L) where L is a list of 
+%% subgoals needed to prove s according to rule orR.
+==============================================================
+Define
+ case orRHelp (alpha |- x \/ y :: beta) = something [alpha |- x :: y :: beta]
+ case orRHelp (?)                       = nothing;
+ orR(alpha |- beta) = orRHelp(alpha |- moveToFront(\/?,beta))
+%Define
+
+==============================================================
+%%      		   andL
+==============================================================
+%% If rule andL applies to sequent s, then this function should
+%% apply andL and yield something(L) where L is a list of 
+%% subgoals needed to prove s according to rule andL.
+==============================================================
+Define
+ case andLHelp (x /\ y :: alpha |- beta) = something [x :: y :: alpha |- beta]
+ case andLHelp (?)                      = nothing;
+ andL(alpha |- beta) = andLHelp(moveToFront(/\?,alpha) |- beta)
+%Define
+
+==============================================================
+%%      	           andR
+==============================================================
+%% If rule andR applies to sequent s, then this function should
+%% apply andR and yield something(L) where L is a list of 
+%% subgoals needed to prove s according to rule andR.
+==============================================================
+Define
+ case andRHelp (alpha |- x /\ y :: beta) = something [(alpha |- x :: beta),(alpha |- y :: beta)]
+ case andRHelp (?)                      = nothing;
+ andR(alpha |- beta) = andRHelp(alpha |- moveToFront(/\?,beta))
+%Define
+
+==============================================================
+%%                        negL
+==============================================================
+%% If rule negL applies to sequent s, then this function should
+%% apply negL and yield something(L) where L is a list of 
+%% subgoals needed to prove s according to rule negL.
+==============================================================
+Define
+ case negLHelp (neg x :: alpha |- beta) = something [alpha |- x :: beta]
+ case negLHelp (?)                      = nothing;
+ negL(alpha |- beta) = negLHelp(moveToFront(neg?, alpha) |- beta)
+%Define
+
+==============================================================
+%%    			  negR
+==============================================================
+%% If rule negR applies to sequent s, then this function should
+%% apply negR and yield something(L) where L is a list of 
+%% subgoals needed to prove s according to rule negR.
+==============================================================
+Define
+ case negRHelp (alpha |- neg x :: beta) = something [x :: alpha |- beta]
+ case negRHelp (?)                      = nothing;
+ negR(alpha |- beta) = negRHelp(alpha |- moveToFront(neg?,beta))
+%Define
+
+==============================================================
+%%      		   impL
+==============================================================
+%% If rule impL applies to sequent s, then this function should
+%% apply impL and yield something(L) where L is a list of 
+%% subgoals needed to prove s according to rule impL.
+==============================================================
+Define
+ case impLHelp (x ==> y :: alpha |- beta) = something [(alpha |- x :: beta),(y :: alpha |- beta)]
+ case impLHelp (?)                      = nothing;
+ impL(alpha |- beta) = impLHelp(moveToFront(==>?, alpha) |- beta)
+%Define
+
+==============================================================
+%%      		   impR
+==============================================================
+%% If rule impR applies to sequent s, then this function should
+%% apply impR and yield something(L) where L is a list of 
+%% subgoals needed to prove s according to rule impR.
+==============================================================
+Define
+ case impRHelp (alpha |- x ==> y :: beta) = something [x :: alpha |- y :: beta]
+ case impRHelp (?)                      = nothing;
+ impR(alpha |- beta) = impRHelp(alpha |- moveToFront(==>?,beta))
+%Define
+
+==============================================================
+%%      		allValid?
+==============================================================
+%% allValid? takes a list of sequents and returns true if
+%% every sequent in the list is valid
+==============================================================
+Define 
+ case allValid?(x) = allSatisfy(a |-> validSequent?(a)) x
+%Define
+
+==============================================================
+%%                    sequentRules
+==============================================================
+%% sequentRules takes a sequent and a list of Rules(functions),
+%% and tries to use each rule on the sequent. If a rule applies,
+%% it should use that rule to get one or two new goals, and 
+%% should test whether the new goals are valid. 
+==============================================================
+Define
+ case sequentRules(?,[]) = false
+ case sequentRules(alpha|-beta, a::b) = sequentRules(alpha|-beta,b) when a(alpha|-beta) == nothing
+ else sequentRules(alpha|-beta,a::?) = allValid?(unsomething(a(alpha|-beta)))
+%Define
+
+==============================================================
+%%      	       validSequent?
+==============================================================
+%% validSequent? takes a sequent and tells whether the sequent
+%% is valid.
+==============================================================
+Define
+ case validSequent?(alpha|-beta) = isBasic?(alpha|-beta) `or` sequentRules(alpha|-beta,[negL,negR,impR,orR,andL,andR,orL,impL])
+ else validSequent?(?) = false
+%Define
+
+==============================================================
+%%      		valid?
+==============================================================
+%% valid? takes a formula and returns true if it is valid.
+%% Formula x is valid if and only if sequent |– x is valid
+==============================================================
+Define
+ case valid?(alpha) = validSequent?([] |- [alpha])
+%Define
+
+Execute
+Match $(s: Sequent) = "P \\/ Q, -Q |- T /\\ Y".
+Match $(t: Sequent) = "|- P ==> P".
+Match $(u: Sequent) = "P, Q|- Q".
+Match $(us: Sequent) = "P \\/ Q |- Q \\/ P".
+Match $(paco: Sequent) = "P, Q|-".
+Match $(mary: Sequent) = "|- P, Q".
+Match $(sho: Formula) = "P \\/ -P".
+Match $(sh: Formula) = "P \\/ Q".
+Match $(shh: Formula) = "P /\\ -P ==> Q".
+Match $(i: Formula) = "P /\\ Q ==> Q \\/ P".
+Writeln["P \\/ Q, -Q |- T /\\ Y is ",$validSequent? (s)].
+Writeln["P, Q |- Q is ",$validSequent? (u)].
+Writeln["|- P ==> P is ",$validSequent? (t)].
+Writeln["P, Q |- is ",$validSequent? (paco)].
+Writeln["P /\\ Q ==> Q \\/ P is ",$valid? i].
+Writeln["|- P, Q is ",$(validSequent? mary)].
+Writeln["P \\/ Q is ",$valid? sh].
+Writeln["P \\/ -P is ",$valid? sho].
+Writeln["P /\\ -P ==> Q is ",$(valid? shh)].
+Writeln["P \\/ Q |- Q \\/ P is ",$(validSequent? us)].
+%Execute
+
+%Package

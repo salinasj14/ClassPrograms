@@ -1,0 +1,112 @@
+Script started on Mon 20 Oct 2014 11:35:09 AM EDT
+]0;salinasj14@pungo:~/progs/Lab7]7;file://pungo/home/INTRA/salinasj14/progs/Lab77]2;salinasj14@pungo:~/progs/Lab7]1;pungo8salinasj14@pungo:~/progs/Lab7> [K7]2;salinasj14@pungo:~/progs/Lab7]1;pungo8salinasj14@pungo:~/progs/Lab7> [K7]2;salinasj14@pungo:~/progs/Lab7]1;pungo8salinasj14@pungo:~/progs/Lab7> javac Lab[K[K[KDebug7a.java
+Picked up _JAVA_OPTIONS:  -Xmx128m -Xms128m
+Debug7a.java:1: error: unclosed comment
+/* Ronnie W. Smith (smithron)
+^
+Debug7a.java:63: error: reached end of file while parsing
+2 errors
+]0;salinasj14@pungo:~/progs/Lab7]7;file://pungo/home/INTRA/salinasj14/progs/Lab77]2;salinasj14@pungo:~/progs/Lab7]1;pungo8salinasj14@pungo:~/progs/Lab7> javac Debug7a.java
+Picked up _JAVA_OPTIONS:  -Xmx128m -Xms128m
+Debug7a.java:26: error: ';' expected
+  public static void main(String[] args)
+                                        ^
+Debug7a.java:36: error: <identifier> expected
+    word = keyboard.next();          // initial word
+        ^
+Debug7a.java:38: error: illegal start of type
+    while (!word.equals("the_end"))  // examine each letter of word
+    ^
+Debug7a.java:38: error: illegal start of type
+    while (!word.equals("the_end"))  // examine each letter of word
+           ^
+Debug7a.java:38: error: ')' expected
+    while (!word.equals("the_end"))  // examine each letter of word
+            ^
+Debug7a.java:38: error: ';' expected
+    while (!word.equals("the_end"))  // examine each letter of word
+                ^
+Debug7a.java:38: error: invalid method declaration; return type required
+    while (!word.equals("the_end"))  // examine each letter of word
+                 ^
+Debug7a.java:38: error: illegal start of type
+    while (!word.equals("the_end"))  // examine each letter of word
+                        ^
+Debug7a.java:38: error: ';' expected
+    while (!word.equals("the_end"))  // examine each letter of word
+                                  ^
+Debug7a.java:62: error: class, interface, or enum expected
+}
+^
+10 errors
+]0;salinasj14@pungo:~/progs/Lab7]7;file://pungo/home/INTRA/salinasj14/progs/Lab77]2;salinasj14@pungo:~/progs/Lab7]1;pungo8salinasj14@pungo:~/progs/Lab7> javac Debug7a.java
+Picked up _JAVA_OPTIONS:  -Xmx128m -Xms128m
+Debug7a.java:36: error: illegal start of expression
+    word = keyboard.next();          / initial word
+                                     ^
+Debug7a.java:36: error: ';' expected
+    word = keyboard.next();          / initial word
+                                              ^
+Debug7a.java:36: error: not a statement
+    word = keyboard.next();          / initial word
+                                               ^
+Debug7a.java:36: error: ';' expected
+    word = keyboard.next();          / initial word
+                                                   ^
+4 errors
+]0;salinasj14@pungo:~/progs/Lab7]7;file://pungo/home/INTRA/salinasj14/progs/Lab77]2;salinasj14@pungo:~/progs/Lab7]1;pungo8salinasj14@pungo:~/progs/Lab7> javac Debug7a.java
+Picked up _JAVA_OPTIONS:  -Xmx128m -Xms128m
+Debug7a.java:34: error: cannot find symbol
+    Scanner keyboard =  Scanner(System.in);   // input device
+                        ^
+  symbol:   method Scanner(InputStream)
+  location: class Debug7a
+1 error
+]0;salinasj14@pungo:~/progs/Lab7]7;file://pungo/home/INTRA/salinasj14/progs/Lab77]2;salinasj14@pungo:~/progs/Lab7]1;pungo8salinasj14@pungo:~/progs/Lab7> javac Debug7a.java
+Picked up _JAVA_OPTIONS:  -Xmx128m -Xms128m
+Debug7a.java:38: error: unclosed string literal
+    while (!word.equals(the_end"))  // examine each letter of word
+                               ^
+1 error
+]0;salinasj14@pungo:~/progs/Lab7]7;file://pungo/home/INTRA/salinasj14/progs/Lab77]2;salinasj14@pungo:~/progs/Lab7]1;pungo8salinasj14@pungo:~/progs/Lab7> javac Debug7a.java
+Picked up _JAVA_OPTIONS:  -Xmx128m -Xms128m
+Debug7a.java:44: error: ')' expected
+      for (position = 0; position <= length-1; position++ 
+                                                         ^
+1 error
+]0;salinasj14@pungo:~/progs/Lab7]7;file://pungo/home/INTRA/salinasj14/progs/Lab77]2;salinasj14@pungo:~/progs/Lab7]1;pungo8salinasj14@pungo:~/progs/Lab7> [K7]2;salinasj14@pungo:~/progs/Lab7]1;pungo8salinasj14@pungo:~/progs/Lab7> [K7]2;salinasj14@pungo:~/progs/Lab7]1;pungo8salinasj14@pungo:~/progs/Lab7> javac Debug7a.java
+Picked up _JAVA_OPTIONS:  -Xmx128m -Xms128m
+Debug7a.java:62: error: reached end of file while parsing
+}
+ ^
+1 error
+]0;salinasj14@pungo:~/progs/Lab7]7;file://pungo/home/INTRA/salinasj14/progs/Lab77]2;salinasj14@pungo:~/progs/Lab7]1;pungo8salinasj14@pungo:~/progs/Lab7> javac Debug7a.java
+Picked up _JAVA_OPTIONS:  -Xmx128m -Xms128m
+Debug7a.java:31: error: not a statement
+    int 0 = vowelCount // count of number of vowels in current word
+    ^
+Debug7a.java:31: error: ';' expected
+    int 0 = vowelCount // count of number of vowels in current word
+       ^
+Debug7a.java:31: error: not a statement
+    int 0 = vowelCount // count of number of vowels in current word
+            ^
+Debug7a.java:31: error: ';' expected
+    int 0 = vowelCount // count of number of vowels in current word
+                      ^
+4 errors
+]0;salinasj14@pungo:~/progs/Lab7]7;file://pungo/home/INTRA/salinasj14/progs/Lab77]2;salinasj14@pungo:~/progs/Lab7]1;pungo8salinasj14@pungo:~/progs/Lab7> javac Debug7a.java
+Picked up _JAVA_OPTIONS:  -Xmx128m -Xms128m
+Debug7a.java:31: error: not a statement
+    int 0 = vowelCount; // count of number of vowels in current word
+    ^
+Debug7a.java:31: error: ';' expected
+    int 0 = vowelCount; // count of number of vowels in current word
+       ^
+Debug7a.java:31: error: not a statement
+    int 0 = vowelCount; // count of number of vowels in current word
+            ^
+3 errors
+]0;salinasj14@pungo:~/progs/Lab7]7;file://pungo/home/INTRA/salinasj14/progs/Lab77]2;salinasj14@pungo:~/progs/Lab7]1;pungo8salinasj14@pungo:~/progs/Lab7> [K7]2;salinasj14@pungo:~/progs/Lab7]1;pungo8salinasj14@pungo:~/progs/Lab7> exit
+
+Script done on Mon 20 Oct 2014 11:50:32 AM EDT

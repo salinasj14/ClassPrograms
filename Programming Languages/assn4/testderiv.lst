@@ -1,0 +1,84 @@
+Thu Nov 24 13:28:23 2016
+ECU Cinnameg, version 9.0.5 (byte code version 73)
+File /home/INTRA/salinasj14/comlang/assn4/testderiv.cmg
+
+
+   1 Package testderiv
+   2 
+   3 %% Test the derivative program.
+   4 
+   5 Import "deriv".
+
+--> Import "/home/INTRA/salinasj14/comlang/assn4/deriv.cmg"
+
+   6 
+   7 ====================================================
+   8 %% Simplify tests
+   9 ====================================================
+  10 
+  11 Define ShowSimplify(e). =
+  12   Writeln[$(e), " = ", $(simplify e)].
+  13 %Define
+
+--> Private.ShowSimplify
+              : (Expression -> ())
+              Define {--private--}
+
+  14 
+  15 Execute
+  16   Writeln["Simplify tests\n--------------"].
+  17   ShowSimplify constant(2) + constant(5).
+  18   ShowSimplify constant(2) + constant(5) + constant(6).
+  19   ShowSimplify xx + constant(0).
+  20   ShowSimplify xx + xx.
+  21   ShowSimplify xx * xx.
+  22   ShowSimplify constant(3) * constant(4).
+  23   ShowSimplify constant(3) ^ constant(3).
+  24   ShowSimplify constant(20) ^ constant(0).
+  25   ShowSimplify xx ^ constant(1).
+  26   ShowSimplify xx ^ constant(2).
+  27   ShowSimplify constant(0) ^ xx.
+  28   ShowSimplify xx ^ constant(0).
+  29   ShowSimplify xx - xx.
+  30   ShowSimplify constant(0) - xx.
+  31   ShowSimplify constant(0) + xx.
+  32   Writeln.
+  33 %Execute
+  34 
+  35 ====================================================
+  36 %% Deriv tests
+  37 ====================================================
+  38 
+  39 Define ShowDeriv(e). =
+  40   Writeln["(", $(e), ")' = ",   $ deriv(e)].
+  41 %Define
+
+--> Private.ShowDeriv
+              : (Expression -> ())
+              Define {--private--}
+
+  42 
+  43 Execute
+  44   Writeln["Deriv tests\n----------"].
+  45   ShowDeriv constant(4) + xx.
+  46   ShowDeriv constant(0) - xx.
+  47   ShowDeriv xx + xx.
+  48   ShowDeriv xx * xx.
+  49   ShowDeriv xx - xx.
+  50   ShowDeriv xx + constant(5)*xx.
+  51   ShowDeriv constant(2) * constant(3) * xx.
+  52   ShowDeriv xx ^ constant(3).
+  53   ShowDeriv constant(0) * xx.
+  54   ShowDeriv xx * constant(0).
+  55   ShowDeriv constant(50) + xx ^ constant(2).
+  56   ShowDeriv xx ^ constant(0).
+  57   ShowDeriv xx ^ constant(1).
+  58   ShowDeriv xx - xx.
+  59   ShowDeriv constant(2) * xx ^ constant(5).
+  60   ShowDeriv constant(5) ^ constant(2).
+  61   ShowDeriv constant(5) * xx.
+  62   ShowDeriv xx * constant(5).
+  63   ShowDeriv constant(5) ^ constant(0).
+  64 %Execute
+  65 %Package
+

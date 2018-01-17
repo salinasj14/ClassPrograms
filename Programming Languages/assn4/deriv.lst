@@ -1,0 +1,740 @@
+Sat Oct 22 00:05:24 2016
+ECU Cinnameg, version 9.0.5 (byte code version 73)
+File /home/INTRA/salinasj14/comlang/assn4/deriv.cmg
+
+
+   1 %% Name: Jose Salinas
+   2 %% Date: 10/07/2016
+   3 %% Tabs: 2
+   4 
+   5 Package deriv
+   6 ==============================================================
+   7 %% This package defines type Expression, and 
+   8 %% some functions on expressions, including
+   9 %% 
+  10 %%    taking the derivative of an expression
+  11 %%   
+  12 %%    simplifying an expression
+  13 %%   
+  14 %% The simplification is very rudimentary.
+  15 ==============================================================
+  16 
+  17 ==============================================================
+  18       export
+  19 ==============================================================
+  20 
+  21 ==============================================================
+  22 %%      Expression
+  23 ==============================================================
+  24 %% The expression type is defined in the body of this package
+  25 %% so that its representation is hidden from view.  Here,
+  26 %% we only advertise that the type exists.
+  27 ==============================================================
+  28 
+  29 %: An expression involves constants, an independent variable
+  30 %: called xx and a collection of operations.  The operations
+  31 %: that are supported are
+  32 %:
+  33 %:   xx   The independent variable
+  34 %:   constant(c)  A constant expression having value c
+  35 %:   A+B    The sum of expressions A and B
+  36 
+  37 Type Expression interface
+  38 
+  39   with ==, $
+  40 %Type
+
+--> Relate Deriv.Expression belongsTo Cmg.AnyEq
+
+--> cmg.$
+              : (Expression -> String)
+              Expect {--public--}
+
+--> cmg.==
+              : ((Expression, Expression) -> Boolean)
+              Expect {--public--}
+
+  41 
+  42 ==============================================================
+  43 %%                derivativeX
+  44 ==============================================================
+  45 
+  46 Exception derivativeX(Expression) 
+  47   "Unable to take the derivative of an expression";
+
+--> deriv.derivativeX
+              : (Expression -> ExceptionType)
+              Pattern {--public--}
+
+--> deriv.derivativeX
+              : (Expression -> ExceptionType)
+              Define {--public--}
+
+--> deriv.derivativeX?
+              : (ExceptionType -> Boolean)
+              Define {--public--}
+
+--> deriv.derivativeXS
+              : {ExceptionKind}
+              Define {--public--}
+
+--> deriv.underivativeX
+              : (ExceptionType -> Expression)
+              Define {--public--}
+
+  48           
+  49 undefined(Expression)
+  50   "this is Undefined"
+  51 
+  52 %Exception
+
+--> deriv.undefined
+              : (Expression -> ExceptionType)
+              Pattern {--public--}
+
+--> deriv.undefined
+              : (Expression -> ExceptionType)
+              Define {--public--}
+
+--> deriv.undefined?
+              : (ExceptionType -> Boolean)
+              Define {--public--}
+
+--> deriv.undefinedS
+              : {ExceptionKind}
+              Define {--public--}
+
+--> deriv.unundefined
+              : (ExceptionType -> Expression)
+              Define {--public--}
+
+  53 
+  54 ==============================================================
+  55 %%      Functions
+  56 ==============================================================
+  57 %% Here are the exported functions for expressions.  Only 
+  58 %% these are public.
+  59 ==============================================================
+  60 
+  61 Expect
+  62   constant  : Real -> Expression
+  63   
+  64       %: constant(r) is an expression that is the
+  65     %: real number r.  For example, constant(2.5)
+  66     %: is the real number 2.5, as an expression.
+
+--> deriv.constant
+              : (Real -> Expression)
+              Expect {--public--}
+
+  67     ;
+  68     
+  69   xx    : Expression
+  70   
+  71       %: xx is the independent variable.
+
+--> deriv.xx
+              : Expression
+              Expect {--public--}
+
+  72     ;
+  73     
+  74   +   : (Expression, Expression) -> Expression
+  75   
+  76       %: a + b is the expression that is the sum of
+  77     %: expressions a and b.
+
+--> deriv.+
+              : ((Expression, Expression) -> Expression)
+              Expect {--public--}
+
+  78     ;
+  79   -   : (Expression, Expression) -> Expression
+  80       %: a - b is the expression that is the difference of
+  81     %: expressions a and b.
+
+--> deriv.-
+              : ((Expression, Expression) -> Expression)
+              Expect {--public--}
+
+  82     ;
+  83 
+  84   *   : (Expression, Expression) -> Expression
+  85       %: a * b is the expression that is the product of
+  86     %: expressions a and b.
+
+--> deriv.*
+              : ((Expression, Expression) -> Expression)
+              Expect {--public--}
+
+  87     ;
+  88   
+  89   ^   : (Expression, Expression) -> Expression
+  90       %: a ^ b is the expression that is the power of
+  91     %: expressions a and b.
+
+--> deriv.^
+              : ((Expression, Expression) -> Expression)
+              Expect {--public--}
+
+  92     ;
+  93 
+  94   deriv   : Expression -> Expression
+  95   
+  96       %: deriv(e) is the derivative of e with
+  97     %: respect to variable xx.
+
+--> deriv.deriv
+              : (Expression -> Expression)
+              Expect {--public--}
+
+  98     ;
+  99   
+ 100   simplify  : Expression -> Expression
+ 101   
+ 102       %: simplify(e) is a (possibly) simplified
+ 103     %: form of expression e.
+
+--> deriv.simplify
+              : (Expression -> Expression)
+              Expect {--public--}
+
+ 104 %Expect
+ 105 
+ 106 
+ 107 ========================================================
+ 108       implementation
+ 109 ========================================================
+ 110 
+ 111 ========================================================
+ 112 %%       Type Expression
+ 113 ========================================================
+ 114 %% Here, type Expression type and its constructors
+ 115 %% and unconstructors are defined.  We do not want the
+ 116 %% default definition of $, and instead define our own.
+ 117 ========================================================
+ 118 
+ 119 Type Expression =
+ 120   
+ 121   --------------------------------------------------
+ 122   %% An expression can be a real constant.
+ 123   --------------------------------------------------
+ 124     
+ 125   | constant(Real)
+ 126     
+ 127   --------------------------------------------------
+ 128   %% An expression can be the independent variable xx.
+ 129   --------------------------------------------------
+ 130     
+ 131   | xx
+ 132     
+ 133   --------------------------------------------------
+ 134   %% An expression can be the sum of two expressions.
+ 135   --------------------------------------------------
+ 136     
+ 137   | Expression + Expression
+ 138 
+ 139   --------------------------------------------------
+ 140   %% An expression can be the difference of two expressions.
+ 141   --------------------------------------------------
+ 142 
+ 143   | Expression - Expression
+ 144   
+ 145   --------------------------------------------------
+ 146   %% An expression can be the product of two expressions.
+ 147   --------------------------------------------------
+ 148   
+ 149   | Expression * Expression
+ 150 
+ 151   --------------------------------------------------
+ 152   %% An expression can be the sum of two expressions.
+ 153   --------------------------------------------------
+ 154 
+ 155   | Expression ^ Expression
+ 156 
+ 157   with ==
+ 158     
+ 159 %Type
+
+--> public type Deriv.Expression
+
+--> Relate Deriv.Expression belongsTo Cmg.AnyEq
+
+--> cmg.==
+              : ((Expression, Expression) -> Boolean)
+              Define {--public--}
+
+--> deriv.*
+              : ((Expression, Expression) -> Expression)
+              Pattern {--public--}
+
+--> deriv.*
+              : ((Expression, Expression) -> Expression)
+              Define {--public--}
+
+--> deriv.+
+              : ((Expression, Expression) -> Expression)
+              Pattern {--public--}
+
+--> deriv.+
+              : ((Expression, Expression) -> Expression)
+              Define {--public--}
+
+--> deriv.-
+              : ((Expression, Expression) -> Expression)
+              Pattern {--public--}
+
+--> deriv.-
+              : ((Expression, Expression) -> Expression)
+              Define {--public--}
+
+--> deriv.^
+              : ((Expression, Expression) -> Expression)
+              Pattern {--public--}
+
+--> deriv.^
+              : ((Expression, Expression) -> Expression)
+              Define {--public--}
+
+--> deriv.constant
+              : (Real -> Expression)
+              Pattern {--public--}
+
+--> deriv.constant
+              : (Real -> Expression)
+              Define {--public--}
+
+--> deriv.xx
+              : Expression
+              Pattern {--public--}
+
+--> deriv.xx
+              : Expression
+              Define {--public--}
+
+--> private.*/-
+              : (Expression -> (Expression, Expression))
+              Define {--private--}
+
+--> private.*?
+              : (Expression -> Boolean)
+              Define {--private--}
+
+--> private.+/-
+              : (Expression -> (Expression, Expression))
+              Define {--private--}
+
+--> private.+?
+              : (Expression -> Boolean)
+              Define {--private--}
+
+--> private.-/-
+              : (Expression -> (Expression, Expression))
+              Define {--private--}
+
+--> private.-?
+              : (Expression -> Boolean)
+              Define {--private--}
+
+--> private.^/-
+              : (Expression -> (Expression, Expression))
+              Define {--private--}
+
+--> private.^?
+              : (Expression -> Boolean)
+              Define {--private--}
+
+--> private.constant?
+              : (Expression -> Boolean)
+              Define {--private--}
+
+--> private.unconstant
+              : (Expression -> Real)
+              Define {--private--}
+
+--> private.xx?
+              : (Expression -> Boolean)
+              Define {--private--}
+
+ 160 ========================================================
+ 161 
+ 162 ========================================================
+ 163 %%    Expression Simplification
+ 164 ========================================================
+ 165 
+ 166 ========================================================
+ 167 %%      simplifySum
+ 168 ========================================================
+ 169 %% simplifySum(e) is a (possibly) simplified form
+ 170 %% of expression e, which is presumed to be a sum.
+ 171 %% The following simplifications are employed.
+ 172 %%
+ 173 %%    0 + a = a         a + 0 = a
+ 174 %%
+ 175 %%    Computation with constants.  We replace 
+ 176 %%    constant(m) + constant(n) by constant(m+n).
+ 177 %%
+ 178 %% simplifySum only looks at e to see if it
+ 179 %% is exactly one of these forms.  It does not
+ 180 %% look inside e for subexpressions that have these
+ 181 %% forms.
+ 182 ========================================================
+ 183 Import "math/mathfun".
+
+--> Import "/usr/local/lib/cinnameg/9-0-5/lib/math/mathfun.cmg"
+
+--> Import "/usr/local/lib/cinnameg/9-0-5/lib/math/math.cmg"
+
+ 184 Define
+ 185   
+ 186   ----------------------------------------------------
+ 187   %% constant arithmetic
+ 188   ----------------------------------------------------
+ 189 
+ 190   case simplifySum(constant(m) + constant(n)) = constant(m+n)
+ 191 
+ 192   ----------------------------------------------------
+ 193   %% 0 + a = a
+ 194   ----------------------------------------------------
+ 195 
+ 196   case simplifySum(constant(0) + a)  = a
+ 197 
+ 198   ----------------------------------------------------
+ 199   %% a + 0 = a
+ 200   ----------------------------------------------------
+ 201 
+ 202   case simplifySum(a + constant(0))  = a
+ 203 
+ 204   ----------------------------------------------------
+ 205   %% a + a = 2a
+ 206   ----------------------------------------------------
+ 207 
+ 208   case simplifySum(a + a)  = constant(2) * a
+ 209 
+ 210   ----------------------------------------------------
+ 211   %% Otherwise, don't simplify.  Return a as is.
+ 212   ----------------------------------------------------
+ 213 
+ 214   else simplifySum(a)  = a
+ 215 %Define
+
+--> private.simplifySum
+              : (Expression -> Expression)
+              Define {--private--}
+
+ 216 
+ 217 ========================================================
+ 218 %%      simplifySub
+ 219 ========================================================
+ 220 %% simplifySub(e) is a (possibly) simplified form
+ 221 %% of expression e, which is presumed to be a sub.
+ 222 %% The following simplifications are employed.
+ 223 %%
+ 224 %%    0 - a = -a         a - 0 = a
+ 225 %%
+ 226 %%    Computation with constants.  We replace 
+ 227 %%    constant(m) - constant(n) by constant(m-n).
+ 228 %%
+ 229 %% simplifySub only looks at e to see if it
+ 230 %% is exactly one of these forms.  It does not
+ 231 %% look inside e for subexpressions that have these
+ 232 %% forms.
+ 233 ========================================================
+ 234 
+ 235 Define
+ 236   
+ 237   ----------------------------------------------------
+ 238   %% constant arithmetic
+ 239   ----------------------------------------------------
+ 240 
+ 241   case simplifySub(constant(m) - constant(n)) = constant(m-n)
+ 242 
+ 243   ----------------------------------------------------
+ 244   %% 0 - a = -a
+ 245   ----------------------------------------------------
+ 246 
+ 247   case simplifySub(constant(0) - a)  = constant(0) - a
+ 248 
+ 249   ----------------------------------------------------
+ 250   %% a - 0 = a
+ 251   ----------------------------------------------------
+ 252 
+ 253   case simplifySub(a - constant(0))  = a
+ 254 
+ 255   ----------------------------------------------------
+ 256   %% a - a = 0
+ 257   ----------------------------------------------------
+ 258 
+ 259   case simplifySub(a - a)  = constant(0)
+ 260 
+ 261   ----------------------------------------------------
+ 262   %% Otherwise, don't simplify.  Return a as is.
+ 263   ----------------------------------------------------
+ 264 
+ 265   else simplifySub(a)  = a
+ 266 %Define
+
+--> private.simplifySub
+              : (Expression -> Expression)
+              Define {--private--}
+
+ 267 
+ 268 ========================================================
+ 269 %%      simplifyMult
+ 270 ========================================================
+ 271 %% simplifyMult(e) is a (possibly) simplified form
+ 272 %% of expression e, which is presumed to be a Mult.
+ 273 %% The following simplifications are employed.
+ 274 %%
+ 275 %%    0 * a = 0         a * 0 = 0
+ 276 %%
+ 277 %%    Computation with constants.  We replace 
+ 278 %%    constant(m) * constant(n) by constant(m*n).
+ 279 %%
+ 280 %% simplifyMult only looks at e to see if it
+ 281 %% is exactly one of these forms.  It does not
+ 282 %% look inside e for subexpressions that have these
+ 283 %% forms.
+ 284 ========================================================
+ 285 
+ 286 Define
+ 287   
+ 288   ----------------------------------------------------
+ 289   %% constant arithmetic
+ 290   ----------------------------------------------------
+ 291 
+ 292   case simplifyMult(constant(m) * constant(n)) = constant(m * n)
+ 293 
+ 294   ----------------------------------------------------
+ 295   %% 0 * ? = 0
+ 296   ----------------------------------------------------
+ 297 
+ 298   case simplifyMult(constant(0) * ?)  = constant(0)
+ 299 
+ 300   ----------------------------------------------------
+ 301   %% ? * 0 = 0
+ 302   ----------------------------------------------------
+ 303 
+ 304   case simplifyMult(? * constant(0))  = constant(0)
+ 305   
+ 306   ----------------------------------------------------
+ 307   %% a * 1 = a
+ 308   ----------------------------------------------------
+ 309 
+ 310   case simplifyMult(a * constant(1))  = a
+ 311 
+ 312   ----------------------------------------------------
+ 313   %% 1 * a = a
+ 314   ----------------------------------------------------
+ 315 
+ 316   case simplifyMult(constant(1) * a)  = a
+ 317 
+ 318   ----------------------------------------------------
+ 319   %% a * a = a^2
+ 320   ----------------------------------------------------
+ 321 
+ 322   case simplifyMult(a * a)  = a ^ constant(2)
+ 323   
+ 324   ----------------------------------------------------
+ 325   %% Otherwise, don't simplify.  Return a as is.
+ 326   ----------------------------------------------------
+ 327 
+ 328   else simplifyMult(a)  = a
+ 329 %Define
+
+--> private.simplifyMult
+              : (Expression -> Expression)
+              Define {--private--}
+
+ 330 
+ 331 ========================================================
+ 332 %%      simplifyPower
+ 333 ========================================================
+ 334 %% simplifyPower(e) is a (possibly) simplified form
+ 335 %% of expression e, which is presumed to be a power.
+ 336 %% The following simplifications are employed.
+ 337 %%
+ 338 %%    0 ^ a = 0         a ^ 0 = 1
+ 339 %%
+ 340 %%    Computation with constants.  We replace 
+ 341 %%    constant(m) ^ constant(n) by constant(m^n).
+ 342 %%
+ 343 %% simplifyPower only looks at e to see if it
+ 344 %% is exactly one of these forms.  It does not
+ 345 %% look inside e for subexpressions that have these
+ 346 %% forms.
+ 347 ========================================================
+ 348 
+ 349 Define
+ 350   
+ 351   ----------------------------------------------------
+ 352   %% 0 ^ 0 is undefined
+ 353   ----------------------------------------------------
+ 354   
+ 355   case simplifyPower(constant(0) ^ constant(0)) = fail(undefined(constant(0)))
+ 356   
+ 357   ----------------------------------------------------
+ 358   %% constant arithmetic
+ 359   ----------------------------------------------------
+ 360 
+ 361   case simplifyPower(constant(m) ^ constant(n)) = constant(m ^* n)
+ 362 
+ 363   ----------------------------------------------------
+ 364   %% ? ^ 0 = 1
+ 365   ----------------------------------------------------
+ 366 
+ 367   case simplifyPower(? ^ constant(0))  = constant(1)
+ 368 
+ 369   ----------------------------------------------------
+ 370   %% 0 ^ ? = 0
+ 371   ----------------------------------------------------
+ 372 
+ 373   case simplifyPower(constant(0) ^ ?)  = constant(0)
+ 374   
+ 375   ----------------------------------------------------
+ 376   %% a ^ 1 = a
+ 377   ----------------------------------------------------
+ 378   
+ 379   case simplifyPower(a ^ constant(1))  = a
+ 380 
+ 381   ----------------------------------------------------
+ 382   %% 1 ^ ? = 1
+ 383   ----------------------------------------------------
+ 384 
+ 385   case simplifyPower(constant(1) ^ ?)  = constant(1)
+ 386   
+ 387   ----------------------------------------------------
+ 388   %% Otherwise, don't simplify.  Return a as is.
+ 389   ----------------------------------------------------
+ 390   
+ 391   else simplifyPower(a) = a
+ 392 
+ 393 %Define
+
+--> private.simplifyPower
+              : (Expression -> Expression)
+              Define {--private--}
+
+ 394 
+ 395 ========================================================
+ 396 %%      simplify
+ 397 ========================================================
+ 398 %% Function simplify does a full simplification, going into
+ 399 %% the structure of an expression looking for subexpressions
+ 400 %% that can be simplified.
+ 401 ========================================================
+ 402 
+ 403 Define
+ 404   case simplify(constant(r)) = constant(r)
+ 405   case simplify(=xx)         = xx
+ 406   case simplify(a + b)       = simplifySum(simplify(a) + simplify(b))
+ 407   case simplify(a - b)       = simplifySub(simplify(a) - simplify(b))
+ 408   case simplify(a * b)       = simplifyMult(simplify(a) * simplify(b))
+ 409   case simplify(a ^ b)       = simplifyPower(simplify(a) ^ simplify(b))
+ 410 %Define
+
+--> deriv.simplify
+              : (Expression -> Expression)
+              Define {--public--}
+
+ 411 
+ 412 
+ 413 ========================================================
+ 414 %%      Computing Derivatives
+ 415 ========================================================
+ 416 
+ 417 ========================================================
+ 418 %%      rawDeriv
+ 419 ========================================================
+ 420 %% rawDeriv(e) is the derivative of expression e with
+ 421 %% respect to variable xx, but it does not do any
+ 422 %% simplifications.  It employs the rules for
+ 423 %% derivatives directly.
+ 424 ========================================================
+ 425 
+ 426 Define 
+ 427     
+ 428   ----------------------------------------------------
+ 429   %% c' = 0.
+ 430   ----------------------------------------------------
+ 431 
+ 432   case rawDeriv(constant(?)) = constant(0)
+ 433 
+ 434   ----------------------------------------------------
+ 435   %% xx' = 1.
+ 436   ----------------------------------------------------
+ 437 
+ 438   case rawDeriv(=xx) = constant(1)
+ 439 
+ 440   ----------------------------------------------------
+ 441   %% (a + b)' = a' + b'.
+ 442   ----------------------------------------------------
+ 443   
+ 444   case rawDeriv(a + b) = rawDeriv(a) + rawDeriv(b)
+ 445 
+ 446   ----------------------------------------------------
+ 447   %% (a - b)' = a' - b'.
+ 448   ----------------------------------------------------
+ 449 
+ 450   case rawDeriv(a - b) = rawDeriv(a) - rawDeriv(b)
+ 451 
+ 452   ----------------------------------------------------
+ 453   %% (a b)' = a(b') + (a')b.
+ 454   ----------------------------------------------------
+ 455   
+ 456   case rawDeriv(a * b) = (a*rawDeriv(b)) + (rawDeriv(a)*b)
+ 457 
+ 458   ----------------------------------------------------
+ 459   %% (a ^ c)' = (c * a ^ c - 1) a'
+ 460   ----------------------------------------------------
+ 461   
+ 462   case rawDeriv(a ^ constant(b)) = constant(b) * a ^ (constant(b) - constant(1)) * rawDeriv(a)
+ 463 
+ 464   ----------------------------------------------------
+ 465   %% No derivative case works
+ 466   ----------------------------------------------------
+ 467 
+ 468   else rawDeriv(e) = fail(derivativeX(e))
+ 469   
+ 470 %Define
+
+--> private.rawDeriv
+              : (Expression -> Expression)
+              Define {--private--}
+
+ 471 
+ 472 ========================================================
+ 473 %%      deriv
+ 474 =======================================================
+ 475 %% Deriv takes the derivative with simplification.
+ 476 =======================================================
+ 477 
+ 478 Define deriv(a) = simplify(rawDeriv(a)).
+
+--> deriv.deriv
+              : (Expression -> Expression)
+              Define {--public--}
+
+ 479 
+ 480 ========================================================
+ 481 %%      $ for Expressions
+ 482 ========================================================
+ 483 %% Function $ is used to convert an expression to a string.
+ 484 %% It tries to make the expression look readable.
+ 485 ========================================================
+ 486 
+ 487 Define
+ 488   case $(constant(r)) = $(r)
+ 489   case $(=xx)         = "x"
+ 490   case $(a + b)       = concat["(", $(a), "+", $(b), ")"]
+ 491   case $(a - b)       = concat["(", $(a), "-", $(b), ")"]
+ 492   case $(a * b)       = concat["(", $(a), "*", $(b), ")"]
+ 493   case $(a ^ b)       = concat["(", $(a), "^", $(b), ")"]
+ 494 %Define
+
+--> cmg.$
+              : (Expression -> String)
+              Define {--public--}
+
+ 495 
+ 496 %Package

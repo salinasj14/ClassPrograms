@@ -1,0 +1,12 @@
+salinasj14
+
+
+2)The problem with Debug7b is the while statement, it should be an if statement.
+
+
+
+3)The 2 problems with Debug7c is there is no search for the vowel "o".
+Also, if a word end with a vowel, it will not register that vowel. So for the word "Steve" it will only register the first "e".
+
+A way to fix both errors is to also search for the vowel "o".
+As for not searching for the last vowel of a word, fix the test case "position < len-1" to "position <= len-1"
